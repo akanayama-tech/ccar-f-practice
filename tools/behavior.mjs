@@ -40,6 +40,19 @@ function ok(code, label, cond, detail = '') {
 }
 
 console.log(`対象ファイル ${SRC}`);
+
+/* 画面に undefined / NaN / [object Object] が出ていないか。
+   1つの状態でしか見ないと、その状態でしか出ない欠陥を捉えられない（実際に踏んだ）。
+   場面ごとに呼んで貯め、最後にまとめて判定する。 */
+const junkSeen = [];
+async function junkAt(where) {
+  const hit = await page.evaluate(() => {
+    const t = document.body.innerText;
+    return ['undefined', 'NaN', '[object Object]'].filter(k => t.includes(k));
+  });
+  if (hit.length) junkSeen.push(where + ': ' + hit.join(' '));
+}
+
 const browser = await chromium.launch({ headless: !HEADED });
 const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
 const errors = [];
@@ -82,6 +95,7 @@ async function clickByText(t) {
   return n;
 }
 
+await junkAt('回答前');
 const first = await snap();
 console.log(`\n対象 Q ${first.id}  正解 ${first.ans?.join(',')}  種別 ${first.type}\n`);
 
@@ -114,6 +128,7 @@ for (let i = 0; i < 8; i++) {
   await page.click('#submit');
   const stamp = (await page.textContent('.stamp'))?.trim();
   if (stamp === 'CORRECT' || stamp === '正解') correctRuns++;
+  if (i === 0) await junkAt('回答後（4段の切り分けが出ている場面）');
   await page.click('#again');
   await page.waitForSelector('#submit');
 }
@@ -143,6 +158,8 @@ ok('S-6', 'キーボード 1 が一番上を選ぶ ', selectedText === before.op
   `押した本文 "${(selectedText || '').slice(0, 28)}…" / 一番上 "${before.opts[0].text.slice(0, 28)}…"`);
 
 /* ---- 画面のエラー ---- */
+
+ok('S-U', '画面に undefined 等が無い', junkSeen.length === 0, junkSeen.slice(0, 2).join(' | '));
 ok('S-0', 'JS エラーが出ていない       ', errors.length === 0, errors.slice(0, 2).join(' | '));
 
 await browser.close();

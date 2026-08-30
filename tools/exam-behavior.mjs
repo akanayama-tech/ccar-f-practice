@@ -24,6 +24,19 @@ const SRC = srcArg >= 0 ? process.argv[srcArg + 1] : join(ROOT, 'index.html');
 let pass = 0, fail = 0;
 const ok = (c, l, cond, d = '') => { if (cond) { pass++; console.log(`  ${c} ${l}  OK ${d}`); } else { fail++; console.log(`  ${c} ${l}  NG ${d}`); } };
 
+
+/* 画面に undefined / NaN / [object Object] が出ていないか。
+   1つの状態でしか見ないと、その状態でしか出ない欠陥を捉えられない（実際に踏んだ）。
+   場面ごとに呼んで貯め、最後にまとめて判定する。 */
+const junkSeen = [];
+async function junkAt(where) {
+  const hit = await page.evaluate(() => {
+    const t = document.body.innerText;
+    return ['undefined', 'NaN', '[object Object]'].filter(k => t.includes(k));
+  });
+  if (hit.length) junkSeen.push(where + ': ' + hit.join(' '));
+}
+
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
 const errors = [];
@@ -77,6 +90,7 @@ async function answerAll(correct) {
   }, correct ? 'correct' : 'wrong');
   await page.click('#t-result');
   await page.waitForSelector('.examcard');
+  await junkAt('模試の結果カード');
   return page.evaluate(() => {
     const cells = [...document.querySelectorAll('.examcard .cell')];
     const score = cells.find(c => c.querySelector('.cl').textContent === 'Score');
@@ -95,6 +109,8 @@ const yes = await page.$('#cok'); if (yes) { await yes.click(); await page.waitF
 const bad = await answerAll(false);
 ok('X-6', '全問誤答で 0点 FAIL     ', bad.score === '0' && bad.badge === 'FAIL', `${bad.score} / ${bad.badge}`);
 
+
+ok('X-U', '画面に undefined 等が無い', junkSeen.length === 0, junkSeen.slice(0, 2).join(' | '));
 ok('X-0', 'JS エラーが出ていない   ', errors.length === 0, errors.slice(0, 2).join(' | '));
 await browser.close();
 console.log(`\n合格 ${pass} / 不合格 ${fail}\n`);

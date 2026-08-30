@@ -328,6 +328,41 @@ code{font-family:var(--mono);font-size:.92em;background:#F0F4F6;padding:1px 5px;
   .res-hero{gap:20px;padding:22px}
   .row{grid-template-columns:1fr 78px 52px;gap:10px;padding:11px 16px}
 }
+/* ---------- つまずきの切り分け（回答後の4段） ---------- */
+.steps{border-top:1px solid var(--line);background:var(--card)}
+.steps .sh{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--faint);padding:14px 24px 0}
+.step{display:flex;gap:13px;align-items:flex-start;padding:12px 24px;border-top:1px solid var(--line-soft)}
+.step:first-of-type{border-top:0}
+.step .sn{font-family:var(--mono);font-size:11px;flex:none;width:20px;height:20px;border-radius:50%;
+  border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;
+  color:var(--muted);margin-top:1px}
+.step.on .sn{background:var(--teal);border-color:var(--teal);color:#fff}
+.step .sb{flex:1;min-width:0}
+.step .st{font-size:13.5px;font-weight:600;margin-bottom:3px}
+.step .sd{font-size:12.5px;color:var(--muted);line-height:1.75}
+.step .sd b{color:var(--ink)}
+.step .act{margin-top:7px;display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.wchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+.wc{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:100px;
+  padding:3px 11px;background:var(--paper);color:var(--ink)}
+.wc:hover{border-color:var(--muted)}
+.wc.gap{background:var(--amber);border-color:var(--amber);color:#fff}
+.wc.known{opacity:.45}
+.wgloss{margin-top:9px;border-left:2px solid var(--amber);padding:7px 12px;background:var(--amber-soft);
+  border-radius:2px;font-size:12.5px;line-height:1.8}
+.wgloss .g{margin-bottom:5px}
+.wgloss .g:last-child{margin-bottom:0}
+.wgloss b{font-family:var(--mono)}
+.wgloss i{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--amber)}
+.diag{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:14px 0 0}
+.diag .d{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:13px 15px}
+.diag .d .dl{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.diag .d .dv{font-family:var(--mono);font-size:26px;font-weight:600;line-height:1.3}
+.diag .d .dn{font-size:12px;color:var(--muted);line-height:1.7;margin-top:5px}
+.diag .d.en .dv{color:var(--amber)}
+.diag .d.tech .dv{color:var(--teal)}
+
 /* ---------- 語彙 ---------- */
 .vnav{display:flex;gap:0;border:1px solid var(--line);border-radius:var(--r);background:var(--card);
   overflow:hidden;margin-bottom:18px}
@@ -4284,6 +4319,147 @@ words: [
 };
 
 
+/* ---- 語と設問の対応 ----
+   どの語がどの設問文・選択肢に出るかの索引。tools/vocab_link.mjs が生成する。
+   設問文と選択肢だけを見ている。解説は解いた後に読むものなので、
+   「英語でつまずいた原因」の候補にはならない。
+   語形の違い（isolate / isolated / isolation）は語幹で当てている。 */
+const VLINK = {
+  "1.3":["escalate","consistent","enforcement","narrow"],
+  "1.4":["capability","escalate","resolution","distinction","resolve","decompose"],
+  "1.5":["escalate","structural","complexity","escalation","calibrate"],
+  "1.6":["validation","consistent","transient","structural","underlying"],
+  "1.7":["retries","transient","trace"],
+  "1.8":["boundary","distinction"],
+  "1.9":["explicit","threshold","escalate","resolution","resolve","escalation"],
+  "1.10":["summarization","compression","persistent"],
+  "2.1":["inherit","inheritance"],
+  "2.2":["exploration","invocation","isolated","narrow"],
+  "2.3":["guarantee","enforcement","narrow","permit"],
+  "2.5":["regardless","convention"],
+  "2.6":["termination"],
+  "2.7":["exploration","independent","capability"],
+  "2.8":["exploration","structural","detection"],
+  "2.9":["exploration","verbose","discovery","degradation"],
+  "2.10":["exploration","verbose","drift","trace","degradation","delegate","subsequent","specification","narrow"],
+  "3.1":["mechanism","requirement","delegation","delegate"],
+  "3.2":["inherit","widen","inheritance"],
+  "3.3":["independent","latency","sequential","parallelism"],
+  "3.4":["explicit","adaptive"],
+  "3.5":["independent","regardless","iterative","coherent"],
+  "3.6":["judgment","scope","degrade"],
+  "3.7":["exploration","capability","discovery","constraints"],
+  "3.8":["summarization","requirement","attribution","structural","compression","specification","underlying","plausible"],
+  "3.9":["explicit","requirement","attribution","structural","silently","reconcile","annotate"],
+  "3.10":["validation","recovery","requirement","transient","resolve","terminate","propagate","distinguish"],
+  "4.1":["convention","narrow"],
+  "4.2":["precisely","requirement","transient","resolve"],
+  "4.3":["exploration","trace"],
+  "4.5":["exploration","validation","severity","trace"],
+  "4.6":["invocation","isolated"],
+  "4.7":["invoke"],
+  "4.8":["decomposition","adaptive","provenance","comprehensive"],
+  "4.9":["decomposition","intermediate","adaptive","escalation","dynamic"],
+  "4.10":["explicit","invocation","inherit","inheritance"],
+  "5.1":["invocation","structural"],
+  "5.2":["mechanism","drift","convention"],
+  "5.3":["regardless","severity","isolation","scope","subsequent","underlying"],
+  "5.4":["independent"],
+  "5.5":["explicit","confidence"],
+  "5.6":["judgment","tolerant"],
+  "5.7":["explicit","boundary","severity","consistent"],
+  "5.8":["judgment","convention","distinguish"],
+  "5.9":["latency","preserve","audit"],
+  "5.10":["explicit","boundary","precisely","severity","consistent","ambiguity","ambiguous","plausible"],
+  "6.1":["validation","guarantee","structural","malformed"],
+  "6.2":["explicit","severity","guarantee","structural"],
+  "6.3":["constraints","suppress"],
+  "6.4":["validation","escalate","compliance","guarantee","constraints","reconciliation","detection"],
+  "6.5":["validation","specification"],
+  "6.6":["transient"],
+  "6.7":["summarization","inconsistent","detection"],
+  "6.9":["validation","consistent","aggregate","specification","uncertainty","detection","systematic"],
+  "6.10":["confidence","validation","threshold","ambiguity","ambiguous","calibrated","calibrate"],
+  "G1":["prerequisite"],
+  "G2":["boundary","detection"],
+  "G3":["explicit","confidence","threshold","boundary","escalate","requirement","resolution","complexity","resolve","escalation","calibrate"],
+  "G5":["structural","complexity","comprehensive"],
+  "G6":["explicit","regardless","distinction","invoke","convention"],
+  "G7":["decomposition","comprehensive","narrow"],
+  "G8":["recovery","retries","structural","complexity","propagate"],
+  "G9":["latency","requirement","complexity","overhead","specification"],
+  "G10":["termination"],
+  "G12":["independent","requirement","inconsistent"],
+  "G13":["validation","requirement","termination","terminate"],
+  "G14":["mechanism","boundary","termination","terminate"],
+  "G15":["severity","simultaneously","degrade","redundant"],
+  "G16":["regardless","complexity","invoke","static"],
+  "G17":["explicit","delegation","invoke"],
+  "G18":["explicit","invocation","invoke"],
+  "G19":["consistent","structural","preserve"],
+  "G20":["independent","throughput"],
+  "G21":["explicit","prerequisite"],
+  "G22":["intermediate","complexity","sequential","distinction","delegate","decompose"],
+  "G23":["architectural","consistent","convention"],
+  "G24":["explicit","validation","threshold","requirement","compliance"],
+  "G25":["exploration","verbose","intermediate"],
+  "G26":["independent","decomposition","compliance","sequential","adaptive","simultaneously","dynamic","comprehensive"],
+  "G27":["independent","decomposition","adaptive","trace","scope","dynamic"],
+  "G28":["specification","detection"],
+  "G29":["independent"],
+  "G30":["validation","requirement","ambiguity","ambiguous","constraints","malformed"],
+  "G31":["distinction"],
+  "G32":["validation","recovery","verbose","transient","structural","trace","specification"],
+  "G33":["confidence","validation","threshold","retries","distinguish"],
+  "G34":["threshold","retries","transient","compliance","detection","distinguish"],
+  "G35":["structural"],
+  "G36":["invocation","judgment","regardless","consistent","guarantee","structural","specification"],
+  "G38":["exploration","discovery","latency","overhead"],
+  "G40":["severity","ambiguity","ambiguous","simultaneously"],
+  "G41":["explicit","inherit","hierarchy","inheritance"],
+  "G42":["independent","convention"],
+  "G43":["exploration","invocation","verbose","intermediate","isolated","inherit","inheritance"],
+  "G44":["convention"],
+  "G45":["exploration","architectural"],
+  "G46":["exploration","verbose","discovery","structural","widen"],
+  "G47":["inconsistent","ambiguity","ambiguous","subsequent","convention"],
+  "G48":["constraints","specification","iterative"],
+  "G50":["threshold","invocation"],
+  "G51":["independent","intermediate","inconsistent","sequential","resolve"],
+  "G52":["widen"],
+  "G53":["severity","structural","specification","brittle"],
+  "G54":["convention"],
+  "G55":["explicit","confidence","validation","threshold","judgment","static"],
+  "G56":["explicit","judgment","severity"],
+  "G57":["explicit","independent","consistent","requirement","inconsistent"],
+  "G58":["consistent","requirement","specification"],
+  "G59":["confidence","boundary","judgment","consistent","ambiguity","ambiguous","termination","audit"],
+  "G60":["requirement"],
+  "G61":["validation","requirement","structural","malformed"],
+  "G62":["judgment","requirement","guarantee"],
+  "G63":["validation","retries","reconcile","specification"],
+  "G64":["confidence","threshold","judgment","aggregate","specification","detection","systematic"],
+  "G65":["compliance","complexity","audit"],
+  "G66":["explicit","independent","boundary","architectural"],
+  "G67":["validation","retries","complexity"],
+  "G68":["explicit","independent","architectural"],
+  "G69":["summarization","subsequent","specification","persistent"],
+  "G70":["explicit","summarization","consistent","reconciliation","mitigate"],
+  "G71":["explicit","threshold","capability","escalate","resolution","resolve","detection"],
+  "G72":["threshold","recovery","regardless","silently","detection"],
+  "G73":["exploration","independent","severity","complexity","degradation","simultaneously","reconcile","specification","mitigate"],
+  "G74":["exploration","drift","compression","subsequent"],
+  "G75":["validation","regardless","aggregate","specification","audit"],
+  "G76":["confidence","validation","threshold","regardless","latency","requirement","drift","calibrated"],
+  "G77":["summarization","requirement","structural","preserve","trace","provenance"]
+};
+/* 語 → その語が出る問題。索引から起こす（二重に持つと必ず片方が腐る） */
+const VBYWORD = (function () {
+  const m = {};
+  for (const qid in VLINK) for (const w of VLINK[qid]) (m[w] = m[w] || []).push(qid);
+  return m;
+})();
+
 /* ---- 模擬試験 ----
    本番は4シナリオ60問120分。ブループリント比率は D1 27 / D2 18 / D3 20 / D4 20 / D5 15 パーセント。
    60問に直すと D1 16 / D2 11 / D3 12 / D4 12 / D5 9 本。
@@ -4354,8 +4530,10 @@ const state = {
   vsec: 'sys',        // 語彙タブの中の面  sys 体系 / dict 単語帳 / drill ドリル
   vq: '',             // 単語帳の絞り込み
   vhist: {},          // 単語 -> { n, ok, ng, streak }
+  wordGap: {},        // 単語 -> 1  「この語が分からなかった」と自分で付けた印
   vdrill: null,       // いま出しているドリル
   vmode: 'e2j',       // e2j 語→義 / j2e 義→語 / cloze 用例の穴埋め
+  vfrom: 'all',       // いまドリルがどこから出しているか
   hist: {},             // qid -> { n, ok, ng, streak, t }
   retry: {},            // qid -> 1  (clear the stored verdict next time it is rendered)
   repeat: false,        // keep re-serving a question until it is mastered
@@ -4468,6 +4646,7 @@ function snapshot() {
     result: state.result,
     hist: state.hist,
     vhist: state.vhist,
+    wordGap: state.wordGap,
     retry: state.retry,
     settings: {
       lang: state.lang, src: state.src, set: state.set, mock: state.mock,
@@ -4500,6 +4679,7 @@ function loadInto(d) {
   if (d.result) state.result = d.result;
   if (d.hist) state.hist = d.hist;
   if (d.vhist) state.vhist = d.vhist;
+  if (d.wordGap) state.wordGap = d.wordGap;
   state.retry = d.retry || {};
   const g = d.settings;
   if (g) {
@@ -4719,6 +4899,71 @@ function examSummary() {
   return h;
 }
 
+/* ---- つまずきの切り分け ----
+   解いた後にやることは4つあって、順番がある。
+     ① 普通に解く
+     ② 日本語訳で確認する        → 意味を取り違えていたのか
+     ③ 技術で分かっていない所を見る → 知識が無かったのか
+     ④ 英単語でつまずいた所を見る  → 読めなかっただけなのか
+   ③と④を分けないと、「落ちた原因が知識か英語か」が最後まで分からない。
+   語は VLINK でこの設問に出るものだけを出す。全体の単語帳から引くのではない。 */
+function wordsOf(qid) { return VLINK[qid] || []; }
+function gapWordsOf(qid) { return wordsOf(qid).filter(w => state.wordGap[w]); }
+function vword(w) { return VOCAB.words.find(x => x.w === w); }
+
+function stepStrip(q, res) {
+  const t = L();
+  const ws = wordsOf(q.id);
+  const gaps = gapWordsOf(q.id);
+  const jaOn = jaVisible(q.id);
+  const d = dmap[q.d];
+  const dst = domainStats(q.d);
+
+  let h = '<div class="steps"><div class="sh">つまずきの切り分け</div>';
+
+  h += '<div class="step on"><span class="sn">1</span><div class="sb">' +
+    '<div class="st">解いた</div><div class="sd">' +
+    (res.ok ? '正解。' : '不正解。ここから先で、原因が<b>技術</b>なのか<b>英語</b>なのかを分ける。') +
+    '</div></div></div>';
+
+  h += '<div class="step' + (jaOn ? ' on' : '') + '"><span class="sn">2</span><div class="sb">' +
+    '<div class="st">日本語で確認する</div>' +
+    '<div class="sd">設問と選択肢を読み違えていなかったかを、訳で突き合わせる。</div>' +
+    '<div class="act"><button class="nav" id="s2">' + (jaOn ? '日本語訳を隠す' : '日本語訳を出す') + '</button></div>' +
+    '</div></div>';
+
+  h += '<div class="step"><span class="sn">3</span><div class="sb">' +
+    '<div class="st">技術を確認する</div>' +
+    '<div class="sd">この問題は <b>ドメイン' + q.d + '　' + esc(d.title) + '</b>（出題比率 ' + d.weight + '%）。' +
+    'このドメイン全 ' + dst.total + ' 問のうち、挑戦した <b>' + dst.done + '</b> 問で習得 <b>' + dst.ok + '</b> 問' +
+    (dst.pct === null ? '（まだ挑戦なし）' : '（習得率 ' + dst.pct + '%）') + '。' +
+    (dst.pct !== null && dst.pct < 75 ? ' 目安の75%を下回っているので、ここを続けて解くのが効く。' : '') +
+    '</div><div class="act">' +
+    '<button class="nav" id="s3">このドメインの未習得だけ解く</button></div>' +
+    '</div></div>';
+
+  h += '<div class="step' + (gaps.length ? ' on' : '') + '"><span class="sn">4</span><div class="sb">' +
+    '<div class="st">英単語を確認する</div>';
+  if (!ws.length) {
+    h += '<div class="sd">この設問には、単語帳に載っている語が出てこない。読めなかったのが原因ではなさそう。</div>';
+  } else {
+    h += '<div class="sd">この設問と選択肢に出てくる語。<b>読めなかったものをタップ</b>すると、意味が出て、あとでドリルに回る。</div>' +
+      '<div class="wchips">' + ws.map(w =>
+        '<button class="wc' + (state.wordGap[w] ? ' gap' : (vMastered(w) ? ' known' : '')) + '" data-gw="' + esc(w) + '">' +
+        esc(w) + '</button>').join('') + '</div>';
+    if (gaps.length) {
+      h += '<div class="wgloss">' + gaps.map(w => {
+        const v = vword(w);
+        return '<div class="g"><b>' + esc(v.w) + '</b>　' + esc(v.ja) + '　<i>' + esc(v.p) + '</i><br>' + esc(v.m) + '</div>';
+      }).join('') + '</div>' +
+      '<div class="act"><button class="nav" id="s4">この語をドリルで確かめる</button>' +
+      '<span class="dstat">分からない印 ' + Object.keys(state.wordGap).length + ' 語</span></div>';
+    }
+  }
+  h += '</div></div></div>';
+  return h;
+}
+
 /* ---- render: question ---- */
 function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
@@ -4815,6 +5060,8 @@ function renderQuiz() {
       (P.no && !P.nos ? '<div class="blk no"><h4>' + t.noH + '</h4><p>' + esc(P.no) + '</p>' + (A && A.no ? '<p class="ja">' + esc(A.no) + '</p>' : '') + '</div>' : '') +
       '</div></div>';
 
+    h += stepStrip(q, res);
+
     const hh = hist(q.id);
     let line = 'この問題: <b>' + hh.n + '</b> 回解答　正解 <b>' + hh.ok + '</b> · 誤答 <b>' + hh.ng + '</b>　連続正解 <b>' + hh.streak + '</b>';
     if (isMastered(q.id)) line += '　<span class="mst">習得済み</span>';
@@ -4834,6 +5081,30 @@ function renderQuiz() {
   const ag = document.getElementById('again'); if (ag) ag.addEventListener('click', () => againNow(q));
   const rv = document.getElementById('reveal');
   if (rv) rv.addEventListener('click', () => { state.reveal[q.id] = !state.reveal[q.id]; renderQuiz(); });
+
+  // 4段の切り分け
+  const s2 = document.getElementById('s2');
+  if (s2) s2.addEventListener('click', () => {
+    if (state.lang === 'en') state.reveal[q.id] = !state.reveal[q.id];
+    else { state.lang = 'en'; state.reveal[q.id] = true; applyUI(); }
+    save(); renderQuiz();
+  });
+  const s3 = document.getElementById('s3');
+  if (s3) s3.addEventListener('click', () => {
+    state.filter = q.d; state.view = 'quiz';
+    pool().filter(x => x.d === q.d && !isMastered(x.id)).forEach(x => { state.retry[x.id] = 1; });
+    buildOrder(); save(); render(); scrollTop();
+  });
+  const s4 = document.getElementById('s4');
+  if (s4) s4.addEventListener('click', () => {
+    state.view = 'vocab'; state.vsec = 'drill'; state.vdrill = null;
+    newDrill(); save(); render(); scrollTop();
+  });
+  stage.querySelectorAll('.wc').forEach(b => b.addEventListener('click', () => {
+    const w = b.dataset.gw;
+    if (state.wordGap[w]) delete state.wordGap[w]; else state.wordGap[w] = 1;
+    save(); renderQuiz();
+  }));
   document.getElementById('prev').addEventListener('click', () => { state.cursor--; render(); });
   document.getElementById('fwd').addEventListener('click', () => { state.cursor++; render(); });
 }
@@ -4903,10 +5174,40 @@ function advance() {
 }
 
 /* ---- render: results ---- */
+/* つまずいた問題を、原因で3つに割る。
+   ④をやっていない問題は「未分類」に置く。勝手に技術のせいにしない。 */
+function diagnosis() {
+  const stuck = pool().filter(q => tried(q.id) && !isMastered(q.id));
+  if (!stuck.length) return '';
+  const en = stuck.filter(q => gapWordsOf(q.id).length);
+  const seen = stuck.filter(q => !gapWordsOf(q.id).length && wordsOf(q.id).length && state.result[q.id]);
+  const rest = stuck.length - en.length - seen.length;
+  const gapN = Object.keys(state.wordGap).length;
+
+  let h = '<div class="tblh">つまずきの内訳 · 間違えた ' + stuck.length + ' 問</div><div class="diag">' +
+    '<div class="d en"><div class="dl">English</div><div class="dv">' + en.length + '<small>問</small></div>' +
+    '<div class="dn">④で「読めなかった」と印を付けた語がある問題。原因は語彙の側。</div></div>' +
+    '<div class="d tech"><div class="dl">Technical</div><div class="dv">' + seen.length + '<small>問</small></div>' +
+    '<div class="dn">語は出てくるが、どれにも印が付いていない問題。読めてはいたので、原因は知識の側。</div></div>' +
+    '<div class="d"><div class="dl">Unclassified</div><div class="dv">' + rest + '<small>問</small></div>' +
+    '<div class="dn">まだ④まで見ていない問題。原因は分からないので、ここは推測しない。</div></div>' +
+    '</div>';
+
+  if (gapN) {
+    const list = Object.keys(state.wordGap).sort();
+    h += '<div class="tblh">読めなかった語 ' + gapN + '</div>' +
+      '<div class="wchips" style="margin-bottom:12px">' +
+      list.map(w => '<button class="wc gap" data-gw2="' + esc(w) + '">' + esc(w) + '</button>').join('') + '</div>' +
+      '<div class="legend">タップで印を外せる。ドリルはこの語から出る。</div>';
+  }
+  return h;
+}
+
 function renderResult() {
   const s = stats();
   const stage = document.getElementById('stage');
   let h = examSummary();
+  h += diagnosis();
   h += '<div class="res-hero"><div><div class="cap">Mastered</div>' +
     '<div class="big">' + s.mst + '<small>/' + s.total + '</small></div></div>' +
     '<div><div class="cap">Accuracy (全試行)</div><div class="big">' + (s.acc === null ? '—' : s.acc) + '<small>%</small></div></div>' +
@@ -4960,6 +5261,9 @@ function renderResult() {
     buildOrder(); save(); render(); scrollTop();
   });
   document.getElementById('backquiz').addEventListener('click', () => { state.view = 'quiz'; render(); });
+  stage.querySelectorAll('[data-gw2]').forEach(b => b.addEventListener('click', () => {
+    delete state.wordGap[b.dataset.gw2]; save(); render();
+  }));
 }
 
 /* ---- 語彙 ----
@@ -5028,8 +5332,15 @@ function vocabDict() {
   const q = state.vq.trim().toLowerCase();
   const list = VOCAB.words.filter(x => !q || x.w.includes(q) || x.ja.includes(state.vq.trim()) || x.m.includes(state.vq.trim()));
   const mst = VOCAB.words.filter(x => vMastered(x.w)).length;
-  let h = '<p class="vnote">出題文から採った ' + VOCAB.words.length + ' 語。多い順。習得 ' + mst + ' / ' + VOCAB.words.length +
-    '。用例はすべて実際の問題文からで、末尾の番号がその問題。</p>' +
+  // 並びは「自分にとっての近さ」順。印を付けた語 → まだ解けない問題に出る語 → 出現回数
+  const stuck = new Set();
+  BANK.filter(x => tried(x.id) && !isMastered(x.id)).forEach(x => wordsOf(x.id).forEach(w => stuck.add(w)));
+  const rank = x => state.wordGap[x.w] ? 0 : (stuck.has(x.w) ? 1 : 2);
+  list.sort((a, b) => rank(a) - rank(b) || b.n - a.n);
+  const gapN = Object.keys(state.wordGap).length;
+  let h = '<p class="vnote">出題文から採った ' + VOCAB.words.length + ' 語。習得 ' + mst + ' / ' + VOCAB.words.length +
+    '。並びは<b>自分にとっての近さ</b>順で、印を付けた語（' + gapN + '）→ まだ解けない問題に出る語 → 出現回数の順。' +
+    '各カードの下に、その語が出てくる問題を並べてある。</p>' +
     '<input class="vsearch" id="vq" placeholder="英語でも日本語でも絞り込める" value="' + esc(state.vq) + '">';
   if (!list.length) h += '<div class="empty">該当なし</div>';
   list.forEach(x => {
@@ -5040,6 +5351,13 @@ function vocabDict() {
       const re = new RegExp('(' + x.w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'i');
       h += '<div class="e">' + esc(x.e).replace(re, '<b>$1</b>') + '<span>Q ' + esc(x.q) + '</span></div>';
     }
+    // その語が出てくる問題。押すとその問題へ飛ぶ
+    const qs = VBYWORD[x.w] || [];
+    if (qs.length) {
+      h += '<div class="wchips">' + qs.slice(0, 14).map(id =>
+        '<button class="wc' + (tried(id) && !isMastered(id) ? ' gap' : '') + '" data-jump="' + esc(id) + '">Q ' + esc(id) + '</button>').join('') +
+        (qs.length > 14 ? '<span class="chip">他 ' + (qs.length - 14) + '</span>' : '') + '</div>';
+    }
     h += '</div>';
   });
   return h;
@@ -5047,10 +5365,29 @@ function vocabDict() {
 
 /* ---- ドリル ----
    出題は3型。どれも4択で、誤答は他の語から引く。 */
+/* 出題元は3段。上から順に、空でなければそこから引く。
+   ランダムに110語から引くと、自分がつまずいた語に当たらない。
+     ① 自分で「分からない」と印を付けた語
+     ② 間違えたまま習得できていない問題に出てくる語
+     ③ それも無ければ全体
+   ①②が尽きたら③に落ちる。 */
+function drillSource() {
+  const usable = VOCAB.words.filter(x => state.vmode !== 'cloze' || x.e);
+  const gap = usable.filter(x => state.wordGap[x.w] && !vMastered(x.w));
+  if (gap.length) return { list: gap, from: 'gap' };
+  const stuck = new Set();
+  BANK.filter(q => tried(q.id) && !isMastered(q.id)).forEach(q => wordsOf(q.id).forEach(w => stuck.add(w)));
+  const fromStuck = usable.filter(x => stuck.has(x.w) && !vMastered(x.w));
+  if (fromStuck.length) return { list: fromStuck, from: 'stuck' };
+  const todo = usable.filter(x => !vMastered(x.w));
+  return { list: todo.length ? todo : usable, from: 'all' };
+}
+
 function newDrill() {
   const pool = VOCAB.words.filter(x => state.vmode !== 'cloze' || x.e);
-  const todo = pool.filter(x => !vMastered(x.w));
-  const src = todo.length ? todo : pool;
+  const src0 = drillSource();
+  const src = src0.list;
+  state.vfrom = src0.from;
   const target = src[Math.floor(Math.random() * src.length)];
   const others = pool.filter(x => x.w !== target.w);
   for (let i = others.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = others[i]; others[i] = others[j]; others[j] = t; }
@@ -5067,6 +5404,10 @@ function vocabDrill() {
   const d = state.vdrill;
   if (!d) { newDrill(); }
   const D = state.vdrill;
+  const fromLabel = { gap: '分からないと印を付けた語から', stuck: 'まだ習得できていない問題に出てくる語から', all: '全語から' };
+  const gapN = Object.keys(state.wordGap).length;
+  h += '<p class="vnote" style="margin:-6px 0 14px">出題元は<b>' + (fromLabel[state.vfrom] || fromLabel.all) + '</b>。' +
+    (gapN ? '印を付けた語 ' + gapN + ' 語。' : '問題を解いて④で語に印を付けると、ここがその語だけになる。') + '</p>';
   const byW = w => VOCAB.words.find(x => x.w === w);
   const t = byW(D.w);
   if (!t) { state.vdrill = null; return h + '<div class="empty">出題できませんでした</div>'; }
@@ -5146,6 +5487,10 @@ function wireVocab() {
     state.vmode = b.dataset.m; state.vdrill = null; newDrill(); save(); render();
   }));
   document.querySelectorAll('.dopt').forEach(b => b.addEventListener('click', () => pickVocab(b.dataset.w)));
+  document.querySelectorAll('[data-jump]').forEach(b => b.addEventListener('click', () => {
+    state.view = 'quiz'; state.filter = 'all';
+    buildOrder(b.dataset.jump); save(); render(); scrollTop();
+  }));
   const nx = document.getElementById('vnext');
   if (nx) nx.addEventListener('click', () => { newDrill(); render(); scrollTop(); });
 }

@@ -21,6 +21,19 @@ const SRC = srcArg >= 0 ? process.argv[srcArg + 1] : join(ROOT, 'index.html');
 let pass = 0, fail = 0;
 const ok = (c, l, cond, d = '') => { if (cond) { pass++; console.log(`  ${c} ${l}  OK ${d}`); } else { fail++; console.log(`  ${c} ${l}  NG ${d}`); } };
 
+
+/* 画面に undefined / NaN / [object Object] が出ていないか。
+   1つの状態でしか見ないと、その状態でしか出ない欠陥を捉えられない（実際に踏んだ）。
+   場面ごとに呼んで貯め、最後にまとめて判定する。 */
+const junkSeen = [];
+async function junkAt(where) {
+  const hit = await page.evaluate(() => {
+    const t = document.body.innerText;
+    return ['undefined', 'NaN', '[object Object]'].filter(k => t.includes(k));
+  });
+  if (hit.length) junkSeen.push(where + ': ' + hit.join(' '));
+}
+
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
 const errors = [];
@@ -57,8 +70,10 @@ async function clickByText(t) {
   if (n < 0) throw new Error('表示テキストで選択肢が見つからない: ' + t);
 }
 
+await junkAt('語彙・体系');
 await page.click('.vnav button[data-v="drill"]');
 await page.waitForSelector('.dcard');
+await junkAt('語彙・ドリル');
 
 /* ---- W-1  3モードで4択 ---- */
 const modeInfo = [];
@@ -116,6 +131,7 @@ ok('W-4', '習得が保存され往復する  ', before > 0 && restored === befo
 /* ---- W-5  単語帳の絞り込み ---- */
 await page.click('.vnav button[data-v="dict"]');
 await page.waitForSelector('.wcard');
+await junkAt('語彙・単語帳');
 const all = await page.evaluate(() => document.querySelectorAll('.wcard').length);
 await page.fill('#vq', 'deterministic');
 await page.waitForTimeout(120);
@@ -131,6 +147,8 @@ const chips = await page.evaluate(() => ({
 }));
 ok('W-6', '参考語が破線で分かれる  ', chips.ref > 0 && chips.ref < chips.total, `参考 ${chips.ref} / 全 ${chips.total}`);
 
+
+ok('W-U', '画面に undefined 等が無い', junkSeen.length === 0, junkSeen.slice(0, 2).join(' | '));
 ok('W-0', 'JS エラーが出ていない   ', errors.length === 0, errors.slice(0, 2).join(' | '));
 await browser.close();
 console.log(`\n合格 ${pass} / 不合格 ${fail}\n`);
