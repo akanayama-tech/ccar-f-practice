@@ -1,0 +1,59 @@
+deterministic	決定論的な	de(完全に)+termin(境界)+-istic(〜的な)	terminal（終点）と同じ語根。境界が完全に決まっていて、同じ入力なら必ず同じ結果が出る状態。プロンプトによる指示が確率的なのに対し、コードによる強制はこちら。
+transient	一時的な・過渡の	trans(越えて)+i(行く)+-ent	通り過ぎていく、の意。障害の分類で最頻。transient なら再試行に意味があり、business ルール違反なら何回試しても同じ。
+provenance	来歴・出所	pro(前へ)+ven(来る)+-ance	美術品の来歴を指す語がそのまま情報の出所に使われる。どこから来たかを追える状態を保つこと。
+attribution	帰属・出典表示	ad(〜へ)+tribut(割り当てる)+-ion	その主張がどの情報源のものかを割り当てること。要約を重ねると真っ先に落ちる。
+isolation	隔離	in(中へ)+sol(単独)+-ation	island（島）と同根。他から切り離して単独にすること。サブエージェントのコンテキスト隔離が代表例。
+invocation	呼び出し	in(中へ)+voc(声)+-ation	vocal（声の）と同じ語根。声をかけて呼び入れること。1回の呼び出しを1 invocation と数える。
+decomposition	分解	de(離す)+com(共に)+pos(置く)+-ition	一緒に置かれていたものをばらすこと。コーディネーターがタスクを割る作業。
+summarization	要約	sum(頂点・総和)+-ar+-ization	総和にまとめること。ここを重ねるほど attribution が落ちる、という論点でよく出る。
+enforcement	強制・執行	en(〜にする)+force(力)+-ment	力ずくで守らせること。プロンプトによる指示との対比で使われる。
+compliance	遵守・準拠	com(共に)+ply(折る)+-ance	相手に合わせて折れること。model compliance は「モデルが指示に従ってくれること」で、確率的だという文脈で出る。
+mechanism	仕組み・機構	mechan(機械)+-ism	その働きを実際に生んでいる部品。「意図」ではなく「機構」があるか、という問い方をする。
+capability	能力・機能	cap(つかむ)+-abil+-ity	取れること。MCP の capability は「そのサーバーが提供できる機能」。
+granularity	粒度	gran(粒)+-ular+-ity	粒の細かさ。ツールを細かく割るか大きくまとめるかの議論で出る。
+threshold	しきい値	古英語 threscold（戸口の敷居）	敷居をまたぐかどうか。confidence threshold は「この値を超えたら自動処理」の線。
+calibrate	較正する・目盛りを合わせる	caliber(口径)+-ate	銃の口径を合わせる語。自己申告の確信度は「較正されていない」＝目盛りが狂っている、という指摘で出る。
+mitigate	和らげる・緩和する	mit(柔らかい)+ag(する)+-ate	消すのではなく軽くする。根治しない対処に使うので、mitigate と書いてあれば「対症療法」と読む。
+propagate	伝播させる	pro(前へ)+pag(打ち込む)+-ate	杭を打って広げる。エラーを上位へ伝播させるか、その場で握りつぶすかの対比で出る。
+escalate	上位へ上げる	e(外へ)+scal(はしご)+-ate	はしごを上る。人間へ引き継ぐこと。escalation は名詞。
+delegate	委ねる・委譲する	de(離す)+leg(送る)+-ate	使者を送り出す。コーディネーターがサブエージェントへ仕事を渡すこと。
+aggregate	集計する・全体の	ag(〜へ)+greg(群れ)+-ate	群れに寄せ集める。aggregate accuracy は「全体をならした精度」で、個別の弱点を隠すという文脈で出る。
+subsequent	後続の	sub(下に)+sequ(続く)+-ent	後に続く。subsequent turns は「それ以降のターン」。
+sequential	逐次の	sequ(続く)+-ential	順番に1つずつ。parallel の対語として出る。
+parallelism	並列性	para(並んで)+allel(互いに)+-ism	同時に走ること。逐次にすると parallelism を失う、という言い方をする。
+simultaneously	同時に	simul(同じ)+-taneous+-ly	同じ瞬間に。並列実行の説明で出る。
+intermediate	中間の・中間生成物	inter(間)+med(中央)+-iate	途中段階のもの。intermediate results は「途中結果」。
+comprehensive	網羅的な	com(共に)+prehend(つかむ)+-ive	まとめてつかむ。「漏れなく」の意で、浅いか深いかとは別の軸。
+exhaustive	しらみつぶしの	ex(外へ)+haust(汲み出す)+-ive	汲み尽くす。comprehensive より徹底の度合いが強い。
+adaptive	適応的な	ad(〜へ)+apt(合わせる)+-ive	状況に合わせて変える。固定手順（prompt chaining）の対。
+iterative	反復的な	iter(再び)+-ative	同じ工程を回す。iteration は1周のこと。
+incremental	漸進的な	in(中へ)+cre(増える)+-mental	少しずつ足す。一気にやらない進め方。
+explicit	明示的な	ex(外へ)+plic(折る)+-it	外へ折り出してある＝はっきり書いてある。暗黙 implicit の対。試験で最頻の語。
+ambiguous	曖昧な・両義的な	ambi(両方)+ag(進む)+-ous	どちらへも取れる。ambiguity は名詞。
+arbitrary	恣意的な	arbitr(裁定者)+-ary	裁定者の気分次第。「根拠のない」という批判語で、arbitrary cap は「恣意的な上限」。
+brittle	脆い・折れやすい	古英語 brytel（砕ける）	曲がらずに折れる。少し条件が変わると全部壊れる設計を指す。
+plausible	もっともらしい	plaus(拍手する)+-ible	拍手できる程度に見える。「正しそうだが確かではない」の含みがある。
+feasible	実行可能な	fac(なす)+-ible	なし得る。plausible が見た目、feasible が実行可能性。
+verbose	冗長な	verb(言葉)+-ose(〜に富む)	言葉が多い。verbose output は「長ったらしい出力」。
+redundant	冗長な・重複した	red(再び)+und(波打つ)+-ant	同じ波が繰り返す。verbose が「長い」なら redundant は「重複している」。
+coherent	筋の通った	co(共に)+her(くっつく)+-ent	全体がくっついている。中身の深さとは別で、浅くても coherent はありうる。
+consistent	一貫した	con(共に)+sist(立つ)+-ent	ぶれない。inconsistent はその否定で、レビューの品質批判で頻出。
+persistent	永続的な・居続ける	per(ずっと)+sist(立つ)+-ent	消えずに残る。persistent case-facts block は「毎回渡し続ける事実の塊」。
+prerequisite	前提条件	pre(前に)+re(強め)+quisit(求める)	先に満たしておくべきこと。プログラム的な prerequisite は、順序をコードで強制すること。
+resolution	解決・解像度	re(戻す)+solu(ほどく)+-tion	ほどき戻すこと。conflict resolution は「食い違いの解消」。
+degradation	劣化	de(下へ)+grad(段)+-ation	段を下る。context degradation は「文脈が長くなるほど精度が落ちる現象」。
+distinction	区別	dis(離す)+stinct(刺す)+-ion	刺して分ける。「その区別を定義していない」が批判の型。
+distinguish	区別する	dis(離す)+stingu(刺す)+-ish	見分ける。distinguishing context は「他と見分けられる文脈」。
+detection	検出	de(離す)+tect(覆う)+-ion	覆いを外して見つける。gap detection は「穴の検出」。
+validation	検証	val(効力)+-idation	効力があると確かめること。schema validation は形式の検証で、意味の検証ではない。
+malformed	形が崩れた	mal(悪く)+form(形)+-ed	壊れた形。malformed JSON は「構文が崩れた JSON」。
+compression	圧縮	com(共に)+press(押す)+-ion	押し込むこと。要約と同じく情報が落ちる工程として扱われる。
+suppress	抑え込む	sub(下へ)+press(押す)	下へ押さえつける。エラーを suppress すると「握りつぶす」意味になる。
+preserve	保つ・そのまま残す	pre(前もって)+serv(守る)	落とさずに残す。attribution is preserved は「出典が保たれる」。
+substitute	置き換える・代替	sub(下に)+stitut(立てる)	代わりに立てる。「本物の代わりにこれを置く」の含み。
+overhead	間接的な負荷・オーバーヘッド	over(上に)+head(頭)	頭上にのしかかる分。処理そのものではない余分なコスト。
+latency	遅延	lat(隠れている)+-ency	表に出るまでの潜伏時間。serial latency は「直列にしたことで積み上がる待ち時間」。
+throughput	処理量	through(通して)+put(置く)	通り抜ける量。latency（1件の速さ）と対で使う。
+bottleneck	律速箇所	bottle(瓶)+neck(首)	瓶の首。全体の速さを決めている一番細い場所。
+silently	黙って・何も言わずに	silent+-ly	気づかせずに。silently drops は「黙って落とす」で、ほぼ常に批判語。
+regardless	〜に関わらず	regard(顧みる)+-less(無い)	顧みない。regardless of location は「場所に関係なく」。

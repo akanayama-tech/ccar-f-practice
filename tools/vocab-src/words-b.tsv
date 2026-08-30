@@ -1,0 +1,58 @@
+boundary	境界	bound(縛る・限る)+-ary	どこまでが内側か。「保証の境界」＝ここまでは保証するがその先はしない、という論点で頻出。
+exploration	探索	ex(外へ)+plor(叫んで探す)+-ation	外へ出て探し回ること。コードベースの探索は出力が長くなりがち、という文脈で出る。
+discovery	発見・探り出し	dis(離す)+cover(覆う)+-y	覆いを外すこと。discovery calls は「何があるかを調べるための呼び出し」。
+judgment	判断	judg(裁く)+-ment	裁定。「判断が要る所」と「規則で決まる所」を分ける議論に出る。
+precisely	正確に・まさに	pre(前もって)+cis(切る)+-ly	きっちり切ってある。this is precisely where は「まさにここで」。
+guarantee	保証	warrant の変形（守る）	必ずそうなると約束すること。何を保証し何を保証しないか、が繰り返し問われる。
+constraints	制約	con(共に)+strain(締める)+-s	締めつけ。スキーマの制約、方針の制約など。
+scope	範囲・スコープ	skop(見る)	見える範囲。scoped は「範囲を限った」で、ツールを役割ごとに絞る話で出る。
+invoke	呼び出す	in(中へ)+voc(声)	声をかけて呼ぶ。invoked は過去分詞。
+resolve	解決する	re(戻す)+solv(ほどく)	もつれをほどく。resolve a conflict は食い違いの解消。
+narrow	狭い・狭める	古英語 nearu	too narrow は「絞りすぎ」で、分解が狭すぎて領域を覆えない、という批判で出る。
+widen	広げる	wide+-en	widen the anchor は「アンカーを広げる」＝一意になるまで周辺の文脈を足すこと。
+drift	ずれていく・漂流	古ノルド語 drifa（押し流される）	じわじわ外れる。configuration drift は「設定が少しずつ食い違っていくこと」。
+audit	監査	aud(聞く)+-it	もとは「聞き取り」。あとから第三者が確かめられる状態を指す。
+trace	追跡する・たどる	tract(引く)	跡をたどる。trace back to the source は「出所まで遡る」。
+annotate	注記する	ad(〜へ)+not(印)+-ate	印を付ける。annotate the conflict は「食い違いを明示的に書き添える」。
+termination	終了	termin(境界)+-ation	終わらせること。エージェントループの停止条件の話で出る。
+terminate	終了させる	termin(境界)+-ate	境界で止める。
+decompose	分解する	de(離す)+compose(組み立てる)	組み立てを解く。
+reconcile	つじつまを合わせる	re(再び)+concil(親しくする)	仲直りさせる。数字が reconcile しない＝合計が合わない。
+reconciliation	照合・整合	reconcile+-ation	合わせる作業そのもの。
+degrade	劣化する	de(下へ)+grad(段)	段を下る。
+static	静的な・固定の	sta(立つ)+-ic	動かない。static routing table は「固定のルーティング表」で、dynamic の対。
+dynamic	動的な	dynam(力)+-ic	その場で決まる。dynamic decomposition は「状況を見て分け方を決める」。
+systematic	体系的な・系統立った	system+-atic	抜けのない手順で。行き当たりばったりの対。
+hierarchy	階層	hier(聖なる)+arch(支配)+-y	もとは聖職者の位階。設定ファイルの階層構造の話で出る。
+inherit	受け継ぐ	in(中へ)+her(相続人)+-it	親から引き継ぐ。「サブエージェントは会話履歴を継承しない」が頻出論点。
+inheritance	継承	inherit+-ance	引き継ぎの仕組みそのもの。
+override	上書きする	over(上に)+ride(乗る)	上に乗って覆す。下位の設定が上位を上書きする、という文脈。
+compress	圧縮する	com(共に)+press(押す)	押し込む。
+compels	強制する	com(強め)+pel(駆り立てる)	駆り立てる。tool_choice が「必ずツールを呼ばせる」働きの説明で出る。
+permit	許す	per(通して)+mit(送る)	通してやる。permits conversational text は「文章での応答を許してしまう」。
+tolerant	許容する	toler(耐える)+-ant	耐えられる。latency-tolerant は「遅延を許容できる」＝バッチ向き。
+inconsistent	一貫しない・ばらつく	in(否定)+consistent	同じものを別々に判定してしまう状態。レビュー品質の批判で頻出。
+ambiguity	曖昧さ	ambi(両方)+ag(進む)+-ity	どちらとも取れること。resolving the ambiguity は「曖昧さを解消する」。
+calibrated	較正された	calibrate+-ed	目盛りが合っている。poorly calibrated は「当てにならない」。
+isolated	隔離された	isolate+-ed	切り離された。
+delegation	委譲	delegate+-ion	仕事を渡すこと。
+escalation	上位への引き継ぎ	escalate+-ion	人間へ渡すこと。
+compliance	遵守	com(共に)+ply(折る)+-ance	相手に合わせて折れること。
+structural	構造的な	struct(積む)+-ural	表面ではなく構造の側の。structural change は「構造そのものを変える手」。
+architectural	アーキテクチャ上の	architect+-ural	設計判断が要る。「アーキ判断が要らない」＝直接実行でよい、という判定に使う。
+complexity	複雑さ	com(共に)+plex(編む)+-ity	絡み合い。query complexity は「問い合わせの複雑さ」。
+capability	能力・機能	cap(つかむ)+-ability	提供できること。
+requirement	要件	require+-ment	求められるもの。
+enforcement	強制	enforce+-ment	守らせること。
+attribution	帰属	ad(〜へ)+tribut(割り当てる)+-ion	どの情報源のものかを割り当てること。
+intermediate	中間の	inter(間)+med(中央)+-iate	途中の。
+recovery	復旧	re(戻す)+cover(覆う)+-y	元へ戻すこと。recovery decision は「どう立て直すかの判断」。
+retries	再試行	re(再び)+try+-es	やり直し。isRetryable は「再試行して意味があるか」の印。
+severity	重要度	sever(厳しい)+-ity	どれだけ深刻か。severity criteria は「重要度の判定基準」。
+confidence	確信度	con(共に)+fid(信じる)+-ence	信じ込む度合い。自己申告の confidence は較正されていない、が定番の論点。
+uncertainty	不確実さ	un(否定)+certain+-ty	確かでないこと。
+convention	慣習・規約	con(共に)+ven(来る)+-tion	みんなが同じ所へ来る型。coding conventions は「コーディング規約」。
+specification	仕様	spec(見る)+-ification	見分けられるように書き下したもの。
+independent	独立した	in(否定)+de(下)+pend(吊るす)+-ent	他にぶら下がっていない。independent subtopics は並列に調べてよい。
+underlying	根底にある	under(下に)+lying(横たわる)	表に出ていない下の層。underlying distinction は「その根っこにある区別」。
+comprehensive	網羅的な	com(共に)+prehend(つかむ)+-ive	まとめてつかむ。

@@ -51,12 +51,24 @@ function extractArray(lines, name) {
   return new Function(`return ${body}`)();
 }
 
+/* 配列でなくオブジェクトの定数を取り出す（VOCAB 用） */
+function extractObject(lines, name) {
+  const head = lines.findIndex(l => l.startsWith(`const ${name} = {`));
+  if (head < 0) return null;
+  let end = -1;
+  for (let i = head + 1; i < lines.length; i++) if (lines[i] === '};') { end = i; break; }
+  if (end < 0) throw new Error(`${name} の終端 "};" が見つからない`);
+  const body = lines.slice(head, end + 1).join('\n').replace(`const ${name} = `, '').replace(/;\s*$/, '');
+  return new Function(`return ${body}`)();
+}
+
 function loadBank(htmlText) {
   const lines = htmlText.split('\n');
   const purcell = extractArray(lines, 'QUESTIONS');
   const gh = extractArray(lines, 'GH');
   if (!purcell || !gh) throw new Error('QUESTIONS / GH を index.html から取り出せない');
   const exams = extractArray(lines, 'EXAMS');   // Phase 1 で入る。無ければ null
+  const vocab = extractObject(lines, 'VOCAB');
   const combosLine = lines.find(l => l.startsWith('const EXAM_COMBOS = '));
   globalThis.__EXAM_COMBOS = combosLine
     ? new Function('return ' + combosLine.replace('const EXAM_COMBOS = ', '').replace(/;\s*$/, ''))()
@@ -66,7 +78,7 @@ function loadBank(htmlText) {
       ...purcell.map(q => ({ ...q, set: 'purcell' })),
       ...gh.map(q => ({ ...q, set: 'gh' }))
     ],
-    exams
+    exams, vocab
   };
 }
 
@@ -348,14 +360,64 @@ function checkExams(bank, exams) {
   return out;
 }
 
+/* ---------- V-1..V-4  語彙 ----------
+   語彙データは問題文から作っている。問題を1問直すと頻度も用例も変わるので、
+   放置すると「本文と食い違う語彙表」が静かに残る。ここで毎回突き合わせる。 */
+function corpusFreq(bank) {
+  const text = [];
+  for (const q of bank) {
+    const e = q.en;
+    text.push(e.stem, ...Object.values(e.opts), e.why, ...(e.nos ? Object.values(e.nos) : []));
+  }
+  const f = {};
+  for (const t of text) for (const w of (plain(t).toLowerCase().match(/[a-z][a-z\-]{2,}/g) || [])) f[w] = (f[w] || 0) + 1;
+  return f;
+}
+
+function checkVocab(bank, vocab) {
+  const out = { code: 'V', implemented: !!vocab, counts: {}, freqDrift: [], badExample: [], thin: [], scanned: 0 };
+  if (!vocab) return out;
+  // シナリオ本文も母集合に入れる（vocab_extract と同じ範囲にそろえる）
+  const f = corpusFreq(bank);
+  out.counts = { prefix: vocab.prefix.length, suffix: vocab.suffix.length, roots: vocab.roots.length, words: vocab.words.length };
+
+  // V-1  体系の例語に付いた回数が、いまの本文と合っているか
+  const checkOne = (w, n, where) => {
+    out.scanned++;
+    const base = String(w).replace(/\(.*\)/, '').trim().toLowerCase();
+    const actual = f[base] || 0;
+    // シナリオ本文ぶんだけずれることがあるので、0 と非0 の別だけを厳密に見る
+    if ((actual === 0) !== (n === 0)) out.freqDrift.push({ w: base, shown: n, actual, where });
+  };
+  for (const g of ['prefix', 'suffix']) for (const it of vocab[g]) for (const e of it.ex) checkOne(e.w, e.n, g + ' ' + it.a);
+  for (const r of vocab.roots) for (const fa of r.fam) checkOne(fa.w, fa.n, 'root ' + r.r);
+
+  // V-2  単語帳の用例が、その語を実際に含んでいるか
+  for (const x of vocab.words) {
+    out.scanned++;
+    if (x.e && !new RegExp(x.w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(x.e))
+      out.badExample.push({ w: x.w, e: x.e.slice(0, 50) });
+    // V-3  単語帳の語がいま本文に在るか
+    if (!(f[x.w.toLowerCase()] > 0)) out.freqDrift.push({ w: x.w, shown: x.n, actual: 0, where: 'words' });
+  }
+
+  // V-4  ドリルが4択を組めるか（各モードで4語以上）
+  const cloze = vocab.words.filter(x => x.e).length;
+  if (vocab.words.length < 4) out.thin.push('単語帳が4語未満');
+  if (cloze < 4) out.thin.push('用例つきの語が4語未満（穴埋めモードが組めない）');
+  out.counts.cloze = cloze;
+  return out;
+}
+
 /* ---------- 実行 ---------- */
 function run(htmlText) {
-  const { bank, exams } = loadBank(htmlText);
+  const { bank, exams, vocab } = loadBank(htmlText);
   const L = checkLength(bank);
   const N = checkPerOption(bank);
   const X = checkLetterRefs(bank);
   const E = checkExams(bank, exams);
-  return { bank, exams, L, N, X, E };
+  const V = checkVocab(bank, vocab);
+  return { bank, exams, vocab, L, N, X, E, V };
 }
 
 function report(r) {
@@ -413,6 +475,22 @@ function report(r) {
     const drawn = (r.exams || []).filter(e => e.draw);
     console.log(`  固定 ${fixed.length}本（${fixed.map(e => e.label).join(' / ')}）本数・シナリオ数・重複なし をすべて満たす`);
     if (drawn.length) console.log(`  抽選 ${drawn.length}本（${drawn.map(e => e.label).join(' / ')}）候補 ${(globalThis.__EXAM_COMBOS || []).length} 通りがすべて比率を満たす`);
+  }
+
+  const V = r.V;
+  console.log(`\n[V-1..4] 語彙  データは問題文から作るので、問題を直すとずれる`);
+  if (!V.implemented) console.log(`  VOCAB 未実装`);
+  else {
+    console.log(`  接頭辞 ${V.counts.prefix} / 接尾辞 ${V.counts.suffix} / 語根 ${V.counts.roots} / 単語帳 ${V.counts.words}（用例つき ${V.counts.cloze}）`);
+    console.log(`  V-1,3 本文との突き合わせ  走査 ${V.scanned} 件  ずれ ${V.freqDrift.length} 件`);
+    if (V.freqDrift.length) {
+      red++;
+      for (const d of (VERBOSE ? V.freqDrift : V.freqDrift.slice(0, 8)))
+        console.log(`    ${d.w}  表示 ${d.shown} / 実際 ${d.actual}  (${d.where})`);
+    }
+    console.log(`  V-2 用例がその語を含むか  違反 ${V.badExample.length} 件`);
+    if (V.badExample.length) { red++; V.badExample.slice(0, 5).forEach(b => console.log(`    ${b.w}: ${b.e}`)); }
+    if (V.thin.length) { red++; V.thin.forEach(t => console.log(`  V-4 ${t}`)); }
   }
 
   console.log(`\n判定  ${red === 0 ? 'すべて緑' : `赤 ${red} 項目`}\n`);
@@ -495,6 +573,28 @@ function selftest(htmlText) {
       }
     }
   } else { console.log('  E-1 EXAMS 未実装のため検査せず'); }
+
+  // V-1  本文に在る語の回数を 0 に書き換えたら、ずれとして拾えるか
+  const vFreq = htmlText.match(/\{"w":"[a-z\-]+","n":[1-9]\d*\}/);
+  if (!vFreq) { console.log('  V-1 変異の対象が見つからない'); fails++; }
+  else {
+    const mutated = htmlText.replace(vFreq[0], vFreq[0].replace(/"n":\d+/, '"n":0'));
+    const after = run(mutated);
+    const grew = after.V.freqDrift.length > base.V.freqDrift.length;
+    console.log(`  V-1 例語の回数を 0 に書き換える → ずれ ${base.V.freqDrift.length} → ${after.V.freqDrift.length} (${grew ? '赤くなった OK' : '素通り NG'})`);
+    if (!grew) fails++;
+  }
+
+  // V-2  用例をその語を含まない文に差し替えたら拾えるか
+  const vEx = htmlText.match(/("e":")([^"]{40,})(","q":")/);
+  if (!vEx) { console.log('  V-2 変異の対象が見つからない'); fails++; }
+  else {
+    const mutated = htmlText.replace(vEx[0], vEx[1] + 'nothing relevant here at all whatsoever' + vEx[3]);
+    const after = run(mutated);
+    const grew = after.V.badExample.length > base.V.badExample.length;
+    console.log(`  V-2 用例を無関係な文に差し替える → 違反 ${base.V.badExample.length} → ${after.V.badExample.length} (${grew ? '赤くなった OK' : '素通り NG'})`);
+    if (!grew) fails++;
+  }
 
   console.log(`\nselftest  ${fails === 0 ? '検査器は壊すと赤くなる（信用してよい）' : `${fails} 項目が反応しなかった（この検査器は信用できない）`}\n`);
   return fails;

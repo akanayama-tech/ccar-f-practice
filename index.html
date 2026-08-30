@@ -152,6 +152,10 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 
 /* ---------- layout ---------- */
 .body{display:grid;grid-template-columns:250px 1fr;gap:28px;align-items:start}
+/* 語彙の面では、問題用のドメイン一覧は関係ないので畳む。
+   スマホだと画面の1/3を占めて、本題まで延々スクロールすることになる。 */
+.body.novrail{grid-template-columns:1fr}
+.body.novrail .rail{display:none}
 
 /* ---------- signature: domain spine ---------- */
 .rail{
@@ -324,6 +328,69 @@ code{font-family:var(--mono);font-size:.92em;background:#F0F4F6;padding:1px 5px;
   .res-hero{gap:20px;padding:22px}
   .row{grid-template-columns:1fr 78px 52px;gap:10px;padding:11px 16px}
 }
+/* ---------- 語彙 ---------- */
+.vnav{display:flex;gap:0;border:1px solid var(--line);border-radius:var(--r);background:var(--card);
+  overflow:hidden;margin-bottom:18px}
+.vnav button{border:0;background:transparent;padding:9px 20px;font-size:13px;color:var(--muted);
+  border-left:1px solid var(--line-soft)}
+.vnav button:first-child{border-left:0}
+.vnav button[aria-pressed="true"]{background:var(--slate);color:#fff}
+.vhead{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);margin:26px 0 10px;padding-bottom:7px;border-bottom:1px solid var(--line)}
+.vhead:first-child{margin-top:0}
+.vnote{font-size:12.5px;color:var(--muted);line-height:1.8;margin:0 0 16px}
+.afx{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.afx .cell{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.afx .a{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--teal)}
+.afx .aj{font-size:13.5px;font-weight:600;margin-left:8px}
+.afx .an{font-size:12px;color:var(--muted);line-height:1.75;margin:6px 0 8px}
+.afx .ex{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line);border-radius:100px;
+  padding:2px 9px;background:var(--paper);white-space:nowrap}
+.chip i{font-style:normal;color:var(--faint);font-size:10px;margin-left:4px}
+.chip.ref{border-style:dashed;color:var(--faint);background:transparent}
+.root{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:12px}
+.root .rh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.root .r{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--teal)}
+.root .rj{font-size:14px;font-weight:600}
+.root .rn{font-size:12px;color:var(--muted);line-height:1.75;margin:7px 0 10px}
+.root table{width:100%;border-collapse:collapse;font-size:13px}
+.root td{padding:5px 8px 5px 0;border-top:1px solid var(--line-soft);vertical-align:top}
+.root td.w{font-family:var(--mono);font-weight:600;white-space:nowrap;width:1%}
+.root td.lit{color:var(--muted);font-size:12px;white-space:nowrap;width:1%}
+.root td.wn{font-family:var(--mono);font-size:10.5px;color:var(--faint);text-align:right;width:1%;white-space:nowrap}
+.vsearch{width:100%;max-width:340px;border:1px solid var(--line);border-radius:var(--r);
+  padding:7px 11px;font-family:inherit;font-size:13px;background:var(--card);color:var(--ink);margin-bottom:14px}
+.vsearch:focus{outline:2px solid var(--teal);outline-offset:1px}
+.wcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:13px 16px;margin-bottom:9px}
+.wcard .wh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.wcard .w{font-family:var(--mono);font-size:16px;font-weight:600}
+.wcard .j{font-size:14px;font-weight:600}
+.wcard .n{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-left:auto}
+.wcard .p{font-family:var(--mono);font-size:11.5px;color:var(--teal);margin:6px 0 0}
+.wcard .m{font-size:12.5px;color:var(--muted);line-height:1.8;margin:5px 0 0}
+.wcard .e{font-size:12.5px;line-height:1.7;margin:8px 0 0;padding:8px 11px;background:var(--paper);
+  border-left:2px solid var(--line);border-radius:2px}
+.wcard .e b{font-weight:600;color:var(--teal)}
+.wcard .e span{display:block;font-family:var(--mono);font-size:10px;color:var(--faint);
+  letter-spacing:.08em;margin-top:4px}
+.wcard.mst{border-left:3px solid var(--teal)}
+.dcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px 24px}
+.dq{font-size:21px;font-weight:600;line-height:1.5;margin-bottom:4px}
+.dq.mono{font-family:var(--mono)}
+.dsub{font-size:12.5px;color:var(--muted);margin-bottom:18px}
+.dopts{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.dopt{display:flex;gap:11px;align-items:flex-start;text-align:left;background:var(--paper);
+  border:1px solid var(--line);border-left:3px solid transparent;border-radius:var(--r);padding:11px 13px;font-size:14px}
+.dopt:hover:not(:disabled){background:#F5F8F9}
+.dopt .k{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:2px;
+  width:19px;height:19px;display:inline-flex;align-items:center;justify-content:center;flex:none;margin-top:1px}
+.dopt.correct{background:var(--teal-soft);border-left-color:var(--teal)}
+.dopt.wrong{background:var(--amber-soft);border-left-color:var(--amber)}
+.dopt.dim{color:var(--muted)}
+.dstat{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.03em}
+.dmode{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px}
+
 /* 390px 級では4つ横並びが入りきらず、時計が切れる。2x2 に折る */
 @media (max-width:430px){
   .gauges{flex-wrap:wrap}
@@ -397,6 +464,7 @@ code{font-family:var(--mono);font-size:.92em;background:#F0F4F6;padding:1px 5px;
       </select>
     </label>
     <button class="tbtn" id="t-result">結果を見る</button>
+    <button class="tbtn" id="t-vocab">英単語</button>
     <div class="spacer"></div>
     <span class="savenote" id="savenote">保存先を確認中…</span>
     <button class="tbtn ghost" id="t-export">書き出し</button>
@@ -4092,6 +4160,130 @@ const GH = [
 const BANK = QUESTIONS.map(q => Object.assign({ set: 'purcell', keys: Object.keys(q.en.opts) }, q))
   .concat(GH.map(q => Object.assign({ set: 'gh', keys: Object.keys(q.en.opts) }, q)));
 
+/* ---- 語彙 ----
+   本番は英語受験なので、読めないと知識があっても落ちる。
+   例語・用例は上の137問の本文から採り、出現回数を n に持つ。
+   n:0 は本文に出ない語で、語根の理解のためだけに並べている（画面では参考と表示する）。
+   このデータは tools/vocab_build.mjs が生成する。手で直さない。 */
+const VOCAB = {
+prefix: [{"a":"sub-","ja":"下に・下位の","note":"上位のものにぶら下がる感じ。組織図の下の段。","ex":[{"w":"subagent","n":80},{"w":"subsequent","n":5},{"w":"subtopic","n":6},{"w":"submit","n":1}]},{"a":"de-","ja":"離す・下へ・完全に","note":"3つの意味が同居する。離す（delegate 委ねる）、下へ（degrade 落ちる）、完全に（determine 完全に境界を引く＝決める）。","ex":[{"w":"delegate","n":5},{"w":"degradation","n":7},{"w":"decomposition","n":19},{"w":"deterministic","n":9},{"w":"detection","n":3}]},{"a":"re-","ja":"再び・後ろへ","note":"もう一度（retry）と、元へ戻す（resolve ほどき戻す）の両方。","ex":[{"w":"retry","n":28},{"w":"resolution","n":10},{"w":"recovery","n":20},{"w":"reference","n":6},{"w":"regardless","n":16}]},{"a":"pre-","ja":"前に","note":"時間の前。prerequisite は「前に要求されるもの」。","ex":[{"w":"prerequisite","n":4},{"w":"prevent","n":3},{"w":"precede","n":2},{"w":"present","n":19}]},{"a":"pro-","ja":"前へ・先へ","note":"pre- が「時間の前」なら pro- は「前方へ出る」動き。","ex":[{"w":"provenance","n":5},{"w":"propagate","n":2},{"w":"produce","n":16},{"w":"process","n":17},{"w":"proceed","n":4}]},{"a":"in- / im-","ja":"中へ／否定","note":"同じ綴りで正反対。invoke は中へ呼ぶ、invalid は valid でない。後ろの語が名詞なら中へ、形容詞なら否定のことが多い。","ex":[{"w":"invoke","n":7},{"w":"intermediate","n":12},{"w":"invalid","n":1},{"w":"inconsistent","n":10}]},{"a":"con- / com-","ja":"共に・一緒に","note":"集める・そろえる感じ。consistent は「一緒に立っている」＝ぶれない。","ex":[{"w":"consistent","n":13},{"w":"compliance","n":12},{"w":"compression","n":6},{"w":"constraints","n":7},{"w":"concerns","n":8}]},{"a":"ex-","ja":"外へ","note":"explicit は「外に折り出された」＝はっきり出ている。暗黙 implicit の対。","ex":[{"w":"explicit","n":39},{"w":"exploration","n":33},{"w":"extraction","n":30},{"w":"execution","n":31},{"w":"exceed","n":3}]},{"a":"trans-","ja":"越えて・移って","note":"transient は「通り過ぎていく」＝一時的な。","ex":[{"w":"transient","n":12},{"w":"transfer","n":2},{"w":"transport","n":2}]},{"a":"inter-","ja":"間に","note":"2つのものの間。intermediate は「中間の」。","ex":[{"w":"intermediate","n":12},{"w":"interception","n":1},{"w":"intelligence","n":1}]},{"a":"dis-","ja":"離す・分ける・否定","note":"discovery は「覆い dis-cover を外す」＝発見。distinction は分けること。","ex":[{"w":"discovery","n":14},{"w":"distinction","n":8},{"w":"distinguish","n":2},{"w":"dispute","n":4}]},{"a":"per-","ja":"通して・ずっと","note":"persistent は「ずっと立っている」＝居続ける。","ex":[{"w":"persistent","n":3},{"w":"permission","n":2},{"w":"performance","n":5}]},{"a":"ad- / at-","ja":"〜の方へ","note":"後ろの子音に合わせて形が変わる（ad + tribute → attribute）。attribution は「〜のせいだと帰する」こと。","ex":[{"w":"attribution","n":12},{"w":"adaptive","n":8},{"w":"address","n":12},{"w":"attempt","n":6}]},{"a":"auto-","ja":"自分で・自動で","note":"autonomous は「自分で法を持つ」＝自律的。","ex":[{"w":"automatically","n":17},{"w":"autonomous","n":1},{"w":"automation","n":4}]},{"a":"multi-","ja":"多い・複数の","note":"multi-issue は「論点が複数の」。","ex":[{"w":"multi-issue","n":3},{"w":"multiple","n":8},{"w":"multi-turn","n":1}]},{"a":"non-","ja":"〜でない","note":"中立的な否定。non-empty は「空でない」。","ex":[{"w":"non-empty","n":2},{"w":"non-blocking","n":1},{"w":"non-interactive","n":4}]},{"a":"over-","ja":"上に・過剰に","note":"overhead は「頭の上にのしかかる分」＝間接費・余分な負荷。","ex":[{"w":"overhead","n":6},{"w":"override","n":1},{"w":"oversized","n":7},{"w":"overwhelmed","n":1}]},{"a":"under-","ja":"下に","note":"underlying は「下に横たわる」＝根底にある。","ex":[{"w":"underlying","n":5},{"w":"understand","n":8}]},{"a":"post-","ja":"後で","note":"pre- の対。post-processing は「後処理」。","ex":[{"w":"post-processing","n":6},{"w":"postpones","n":5},{"w":"post-synthesis","n":1}]},{"a":"mis-","ja":"誤って","note":"misread は読み違い。批判の語に多い。","ex":[{"w":"misread","n":4},{"w":"misuse","n":1},{"w":"mismatch","n":4},{"w":"misclassify","n":0}]},{"a":"counter-","ja":"逆に・対抗して","note":"counterexample は「反例」。","ex":[{"w":"counterexample","n":0},{"w":"counterpart","n":0}]},{"a":"un-","ja":"〜でない・戻す","note":"形容詞の否定（unreliable）と動作の取り消し（undo）。","ex":[{"w":"unreliable","n":5},{"w":"unambiguous","n":3},{"w":"unconstrained","n":1},{"w":"undo","n":1}]},{"a":"semi-","ja":"半分・やや","note":"semi-structured は「半構造化の」。","ex":[{"w":"semi-structured","n":0}]},{"a":"co-","ja":"共同で","note":"coordinator は「一緒に順序づける人」＝取りまとめ役。","ex":[{"w":"coordinator","n":67},{"w":"correlate","n":6},{"w":"coherent","n":2}]}],
+suffix: [{"a":"-tion / -sion","ja":"〜すること（動作の名詞）","note":"動詞を名詞にする最頻の形。validate → validation。","ex":[{"w":"validation","n":25},{"w":"isolation","n":8},{"w":"decomposition","n":19},{"w":"invocation","n":20},{"w":"compression","n":6}]},{"a":"-ment","ja":"〜すること・〜したもの","note":"-tion より結果物寄り。judgment は「判断したもの」。","ex":[{"w":"judgment","n":19},{"w":"enforcement","n":7},{"w":"requirement","n":13},{"w":"assignment","n":3}]},{"a":"-ance / -ence","ja":"〜である状態","note":"compliance は「従っている状態」。","ex":[{"w":"compliance","n":12},{"w":"provenance","n":5},{"w":"reference","n":6},{"w":"difference","n":2}]},{"a":"-ity / -ility","ja":"〜であること（性質）","note":"形容詞を名詞に。capable → capability、granular → granularity。","ex":[{"w":"capability","n":17},{"w":"granularity","n":3},{"w":"complexity","n":10},{"w":"reliability","n":6}]},{"a":"-ness","ja":"〜さ（性質）","note":"-ity がラテン語系なのに対しこちらはゲルマン語系。","ex":[{"w":"completeness","n":0},{"w":"correctness","n":6},{"w":"robustness","n":0}]},{"a":"-ous","ja":"〜の性質を持つ（形容詞）","note":"ambiguous は「両方へ ambi- 進む ag- 性質」＝どちらとも取れる。","ex":[{"w":"ambiguous","n":8},{"w":"autonomous","n":1},{"w":"verbose(-ose)","n":16}]},{"a":"-ive","ja":"〜する傾向がある（形容詞）","note":"adaptive は「適応する性質の」。","ex":[{"w":"adaptive","n":8},{"w":"iterative","n":3},{"w":"effective","n":11},{"w":"comprehensive","n":5}]},{"a":"-able / -ible","ja":"〜できる","note":"retryable は「再試行できる」。造語しやすいので新語がよく出る。","ex":[{"w":"retryable","n":1},{"w":"plausible","n":3},{"w":"feasible","n":1},{"w":"traceable","n":0}]},{"a":"-al","ja":"〜に関する（形容詞）","note":"structural は「構造に関する」。","ex":[{"w":"structural","n":10},{"w":"architectural","n":14},{"w":"sequential","n":9},{"w":"incremental","n":2}]},{"a":"-ic / -istic","ja":"〜的な","note":"deterministic は「決定する性質の」。","ex":[{"w":"deterministic","n":9},{"w":"systematic","n":2},{"w":"dynamic","n":6},{"w":"static","n":3}]},{"a":"-ate","ja":"〜にする（動詞）／〜された（形容詞）","note":"動詞と形容詞で発音が変わる。delegate（デリゲイト＝委ねる）と intermediate（インターミディエット＝中間の）。","ex":[{"w":"delegate","n":5},{"w":"escalate","n":15},{"w":"calibrate","n":3},{"w":"aggregate","n":6},{"w":"intermediate","n":12}]},{"a":"-ify / -ize","ja":"〜にする（動詞）","note":"specify は「specific にする」＝明示する。","ex":[{"w":"specify","n":3},{"w":"verify","n":11},{"w":"normalize","n":2},{"w":"summarize","n":3}]},{"a":"-ly","ja":"〜のように（副詞）","note":"precisely、silently。文の意味を反転させることがあるので読み飛ばさない。","ex":[{"w":"precisely","n":16},{"w":"silently","n":7},{"w":"explicitly","n":10},{"w":"simultaneously","n":6}]},{"a":"-er / -or","ja":"〜する人・もの","note":"coordinator、reviewer。エージェント設計では「役割の名前」として頻出。","ex":[{"w":"coordinator","n":67},{"w":"reviewer","n":28},{"w":"developer","n":35},{"w":"parameter","n":13}]},{"a":"-ency / -ancy","ja":"〜である性質","note":"dependency は「依存している状態」。","ex":[{"w":"dependency","n":3},{"w":"consistency","n":5},{"w":"latency","n":13},{"w":"redundancy","n":0}]},{"a":"-less","ja":"〜が無い","note":"regardless は「顧みる regard ことが無い」＝〜に関わらず。","ex":[{"w":"regardless","n":16},{"w":"stateless","n":0},{"w":"seamless","n":0}]},{"a":"-ful","ja":"〜に満ちた","note":"successful は「成功に満ちた」。","ex":[{"w":"successful","n":7},{"w":"graceful","n":0},{"w":"meaningful","n":3}]},{"a":"-wise","ja":"〜の観点で","note":"otherwise は「他のやり方では」＝さもなければ。","ex":[{"w":"otherwise","n":0},{"w":"likewise","n":0}]}],
+roots: [{"r":"term / termin","ja":"境界・終わり","note":"terminal（終点）と同じ根。境界を引く＝決める。","fam":[{"w":"deterministic","lit":"完全に de- 境界が決まっている","ja":"決定論的な","n":9},{"w":"terminate","lit":"終わりにする","ja":"終了させる","n":5},{"w":"termination","lit":"終わらせること","ja":"終了","n":5},{"w":"determine","lit":"完全に境界を引く","ja":"決定する","n":1}]},{"r":"sequ / secut","ja":"続く・後を追う","note":"「順番に続いていく」。","fam":[{"w":"sequential","lit":"続いていく","ja":"逐次の","n":9},{"w":"subsequent","lit":"下に続く","ja":"後続の","n":5},{"w":"sequence","lit":"続き","ja":"順序・並び","n":9},{"w":"consequence","lit":"一緒に続いて起きること","ja":"帰結","n":2}]},{"r":"struct","ja":"積み上げる・建てる","note":"construction（建設）と同根。instruction は「中へ積む」＝教え込むこと。","fam":[{"w":"structured","lit":"組み立てられた","ja":"構造化された","n":42},{"w":"structural","lit":"構造に関する","ja":"構造的な","n":10},{"w":"instruction","lit":"中へ積む","ja":"指示","n":27},{"w":"construct","lit":"共に積む","ja":"構文・構造物","n":5}]},{"r":"sist / sta / st","ja":"立つ","note":"stand と同じ。「その場に立っている」イメージ。","fam":[{"w":"consistent","lit":"一緒に立っている","ja":"一貫した","n":13},{"w":"persistent","lit":"ずっと立っている","ja":"永続的な","n":3},{"w":"inconsistent","lit":"一緒に立てていない","ja":"ばらつく","n":10},{"w":"status","lit":"立っている状態","ja":"状態","n":13},{"w":"instance","lit":"そばに立つもの","ja":"実体・個体","n":8}]},{"r":"val","ja":"価値がある・強い","note":"value と同じ。valid は「効力が立っている」。","fam":[{"w":"validation","lit":"効力があると確かめること","ja":"検証","n":25},{"w":"valid","lit":"効力がある","ja":"妥当な","n":18},{"w":"invalid","lit":"効力がない","ja":"無効な","n":1},{"w":"evaluate","lit":"外へ価値を出す","ja":"評価する","n":6}]},{"r":"solv / solu","ja":"ほどく・解く","note":"結び目をほどく。resolve は「もう一度ほどく」＝解決する。","fam":[{"w":"resolve","lit":"ほどき戻す","ja":"解決する","n":8},{"w":"resolution","lit":"ほどくこと","ja":"解決・解像度","n":10},{"w":"solution","lit":"解かれたもの","ja":"解決策","n":1}]},{"r":"press","ja":"押す","note":"圧をかける。compression は「一緒に押し込む」。","fam":[{"w":"compression","lit":"一緒に押し込むこと","ja":"圧縮","n":6},{"w":"suppress","lit":"下へ押さえる","ja":"抑え込む","n":1},{"w":"express","lit":"外へ押し出す","ja":"表現する・明示の","n":0}]},{"r":"scrib / script","ja":"書く","note":"description は「下へ書き下したもの」＝説明。","fam":[{"w":"description","lit":"下へ書く","ja":"説明文","n":30},{"w":"describe","lit":"下へ書く","ja":"記述する","n":3},{"w":"script","lit":"書かれたもの","ja":"台本・スクリプト","n":10}]},{"r":"cap / cip / cept","ja":"つかむ・取る","note":"capacity は「取れる量」。intercept は「間で取る」＝横取りする。","fam":[{"w":"capability","lit":"取れること","ja":"能力・機能","n":17},{"w":"capacity","lit":"取れる量","ja":"容量","n":11},{"w":"capture","lit":"つかむ","ja":"捕える","n":2},{"w":"intercept","lit":"間でつかむ","ja":"横取りする","n":3}]},{"r":"port","ja":"運ぶ","note":"港 port は「運び込む場所」。report は「後ろへ運ぶ」＝持ち帰って伝える。","fam":[{"w":"report","lit":"後ろへ運ぶ","ja":"報告する","n":54},{"w":"transport","lit":"越えて運ぶ","ja":"転送・輸送","n":2},{"w":"support","lit":"下から運ぶ","ja":"支える","n":6},{"w":"important","lit":"中へ運び込む","ja":"重要な","n":4}]},{"r":"ven / vent","ja":"来る","note":"provenance は「前から来たもの」＝どこから来たかの記録。","fam":[{"w":"provenance","lit":"前から来ること","ja":"来歴・出所","n":5},{"w":"prevent","lit":"前に来て立ちふさがる","ja":"防ぐ","n":3},{"w":"event","lit":"外へ出てくるもの","ja":"出来事","n":0}]},{"r":"tain / ten","ja":"保つ・持つ","note":"contain は「一緒に持つ」＝含む。","fam":[{"w":"maintain","lit":"手で保つ","ja":"保守する","n":7},{"w":"contain","lit":"一緒に持つ","ja":"含む","n":9},{"w":"content","lit":"中に持たれたもの","ja":"中身","n":21},{"w":"retain","lit":"後ろへ保つ","ja":"保持する","n":0}]},{"r":"spec / spect","ja":"見る","note":"inspect は「中を見る」。specific は「見分けられた」＝特定の。","fam":[{"w":"specific","lit":"見分けられた","ja":"特定の・具体的な","n":32},{"w":"specify","lit":"見分けられるようにする","ja":"明示する","n":3},{"w":"aspect","lit":"〜の方を見た姿","ja":"観点","n":1},{"w":"inspect","lit":"中を見る","ja":"検査する","n":2}]},{"r":"fer","ja":"運ぶ・もたらす","note":"reference は「後ろへ運んで戻す」＝参照。infer は「中へ運び込む」＝推論する。","fam":[{"w":"reference","lit":"後ろへ運び戻すもの","ja":"参照","n":6},{"w":"transfer","lit":"越えて運ぶ","ja":"移す","n":2},{"w":"infer","lit":"中へ運び込む","ja":"推論する","n":6},{"w":"different","lit":"離して運ぶ","ja":"異なる","n":27}]},{"r":"duc / duct","ja":"導く","note":"produce は「前へ導き出す」＝生み出す。","fam":[{"w":"produce","lit":"前へ導き出す","ja":"生み出す","n":16},{"w":"reduce","lit":"後ろへ導く","ja":"減らす","n":11},{"w":"introduce","lit":"中へ導き入れる","ja":"導入する","n":1},{"w":"production","lit":"生み出すこと","ja":"本番・生産","n":10}]},{"r":"ject","ja":"投げる","note":"reject は「投げ返す」。project は「前へ投げる」＝計画・投影。","fam":[{"w":"reject","lit":"投げ返す","ja":"却下する","n":4},{"w":"project","lit":"前へ投げる","ja":"計画・投影する","n":20},{"w":"object","lit":"向かって投げられたもの","ja":"対象・異議を唱える","n":0}]},{"r":"cede / cess","ja":"行く・進む","note":"process は「前へ進むこと」。exceed は「外へ出て行く」＝超える。","fam":[{"w":"process","lit":"前へ進むこと","ja":"処理・工程","n":17},{"w":"exceed","lit":"外へ出て行く","ja":"超える","n":3},{"w":"precede","lit":"前を行く","ja":"先立つ","n":2},{"w":"access","lit":"〜へ行くこと","ja":"アクセス","n":7}]},{"r":"grad / gress","ja":"歩む・段","note":"grade（段階）と同じ。degradation は「段を下る」＝劣化。","fam":[{"w":"degradation","lit":"段を下ること","ja":"劣化","n":7},{"w":"degrade","lit":"段を下る","ja":"劣化する","n":2},{"w":"aggregate","lit":"群れへ寄せ集める","ja":"集計する・全体の","n":6}]},{"r":"mit / miss","ja":"送る・放つ","note":"submit は「下へ送る」＝提出する。omit は「外へ送る」＝省く。","fam":[{"w":"submit","lit":"下へ送る","ja":"提出する","n":1},{"w":"omit","lit":"外へ送る","ja":"省く","n":3},{"w":"emit","lit":"外へ放つ","ja":"発する","n":2},{"w":"permission","lit":"通して送ることを許すこと","ja":"許可","n":2}]},{"r":"pend / pens","ja":"掛ける・吊るす","note":"depend は「下に吊るされている」＝頼っている。","fam":[{"w":"depend","lit":"下に吊るされる","ja":"依存する","n":5},{"w":"dependency","lit":"吊るされている状態","ja":"依存関係","n":3},{"w":"independent","lit":"吊るされていない","ja":"独立した","n":29},{"w":"expensive","lit":"外へ量り出す","ja":"高価な","n":3}]},{"r":"leg / lect","ja":"選ぶ・読む","note":"select は「離して選ぶ」。collect は「一緒に集める」。","fam":[{"w":"select","lit":"離して選ぶ","ja":"選ぶ","n":14},{"w":"selection","lit":"選ぶこと","ja":"選択","n":30},{"w":"collect","lit":"一緒に集める","ja":"集める","n":0},{"w":"intelligence","lit":"間から選び取る力","ja":"知能・情報","n":1}]},{"r":"fac / fic / fect","ja":"作る・なす","note":"effective は「外へなし遂げる」＝効果のある。","fam":[{"w":"effective","lit":"外へなし遂げる","ja":"効果のある","n":11},{"w":"efficient","lit":"手際よくなす","ja":"効率的な","n":1},{"w":"verification","lit":"真 ver- を作ること","ja":"検証","n":8},{"w":"artefact","lit":"技で作られたもの","ja":"成果物・産物","n":2}]},{"r":"cur / curs","ja":"走る","note":"current は「いま走っている」＝現在の・流れ。occur は「向かって走ってくる」＝起きる。","fam":[{"w":"current","lit":"いま走っている","ja":"現在の","n":11},{"w":"occur","lit":"向かって走ってくる","ja":"起きる","n":2},{"w":"concurrent","lit":"一緒に走る","ja":"並行の","n":0},{"w":"recur","lit":"また走る","ja":"再発する","n":0}]}],
+words: [
+  {"w":"explicit","ja":"明示的な","n":39,"p":"ex(外へ)+plic(折る)+-it","m":"外へ折り出してある＝はっきり書いてある。暗黙 implicit の対。試験で最頻の語。","e":"Depends on inference rather than explicit matching.","q":"G6"},
+  {"w":"exploration","ja":"探索","n":33,"p":"ex(外へ)+plor(叫んで探す)+-ation","m":"外へ出て探し回ること。コードベースの探索は出力が長くなりがち、という文脈で出る。","e":"Destroys the baseline the second exploration needs.","q":"G29"},
+  {"w":"mechanism","ja":"仕組み・機構","n":30,"p":"mechan(機械)+-ism","m":"その働きを実際に生んでいる部品。「意図」ではなく「機構」があるか、という問い方をする。","e":"Describes a mechanism that does not exist.","q":"G4"},
+  {"w":"independent","ja":"独立した","n":29,"p":"in(否定)+de(下)+pend(吊るす)+-ent","m":"他にぶら下がっていない。independent subtopics は並列に調べてよい。","e":"An independent instance evaluates the code on its own terms.","q":"5.4"},
+  {"w":"confidence","ja":"確信度","n":26,"p":"con(共に)+fid(信じる)+-ence","m":"信じ込む度合い。自己申告の confidence は較正されていない、が定番の論点。","e":"This is false: confidence can be reported per field.","q":"G76"},
+  {"w":"validation","ja":"検証","n":25,"p":"val(効力)+-idation","m":"効力があると確かめること。schema validation は形式の検証で、意味の検証ではない。","e":"Removes the validation instead of finding the cause.","q":"G67"},
+  {"w":"threshold","ja":"しきい値","n":23,"p":"古英語 threscold（戸口の敷居）","m":"敷居をまたぐかどうか。confidence threshold は「この値を超えたら自動処理」の線。","e":"A developer proposes using the model's stated confidence scores directly as the routing threshold.","q":"G76"},
+  {"w":"boundary","ja":"境界","n":21,"p":"bound(縛る・限る)+-ary","m":"どこまでが内側か。「保証の境界」＝ここまでは保証するがその先はしない、という論点で頻出。","e":"Add boundary language differentiating the two — e.g.","q":"1.8"},
+  {"w":"invocation","ja":"呼び出し","n":20,"p":"in(中へ)+voc(声)+-ation","m":"vocal（声の）と同じ語根。声をかけて呼び入れること。1回の呼び出しを1 invocation と数える。","e":"Requires manual invocation and never activates on its own.","q":"G44"},
+  {"w":"recovery","ja":"復旧","n":20,"p":"re(戻す)+cover(覆う)+-y","m":"元へ戻すこと。recovery decision は「どう立て直すかの判断」。","e":"Hides the very context that recovery decisions need.","q":"3.10"},
+  {"w":"decomposition","ja":"分解","n":19,"p":"de(離す)+com(共に)+pos(置く)+-ition","m":"一緒に置かれていたものをばらすこと。コーディネーターがタスクを割る作業。","e":"Which decomposition approach fits?","q":"4.8"},
+  {"w":"judgment","ja":"判断","n":19,"p":"judg(裁く)+-ment","m":"裁定。「判断が要る所」と「規則で決まる所」を分ける議論に出る。","e":"Statistically launders an unanchored judgment.","q":"5.7"},
+  {"w":"retries","ja":"再試行","n":18,"p":"re(再び)+try+-es","m":"やり直し。isRetryable は「再試行して意味があるか」の印。","e":"Retries blind and will mostly reproduce the same error.","q":"G63"},
+  {"w":"capability","ja":"能力・機能","n":17,"p":"cap(つかむ)+-abil+-ity","m":"取れること。MCP の capability は「そのサーバーが提供できる機能」。","e":"Which MCP capability reduces this?","q":"3.7"},
+  {"w":"verbose","ja":"冗長な","n":16,"p":"verb(言葉)+-ose(〜に富む)","m":"言葉が多い。verbose output は「長ったらしい出力」。","e":"What best preserves main session context during verbose exploration?","q":"G46"},
+  {"w":"regardless","ja":"〜に関わらず","n":16,"p":"regard(顧みる)+-less(無い)","m":"顧みない。regardless of location は「場所に関係なく」。","e":"You want all tests to follow the same conventions regardless of location.","q":"G6"},
+  {"w":"precisely","ja":"正確に・まさに","n":16,"p":"pre(前もって)+cis(切る)+-ly","m":"きっちり切ってある。this is precisely where は「まさにここで」。","e":"This is precisely where the associations are lost.","q":"G19"},
+  {"w":"escalate","ja":"上位へ上げる","n":15,"p":"e(外へ)+scal(はしご)+-ate","m":"はしごを上る。人間へ引き継ぐこと。escalation は名詞。","e":"The agent must escalate a complex billing dispute mid-process.","q":"1.5"},
+  {"w":"severity","ja":"重要度","n":15,"p":"sever(厳しい)+-ity","m":"どれだけ深刻か。severity criteria は「重要度の判定基準」。","e":"That is what makes severity gates dependable.","q":"5.7"},
+  {"w":"discovery","ja":"発見・探り出し","n":14,"p":"dis(離す)+cover(覆う)+-y","m":"覆いを外すこと。discovery calls は「何があるかを調べるための呼び出し」。","e":"Defers discovery to runtime failures.","q":"G52"},
+  {"w":"architectural","ja":"アーキテクチャ上の","n":14,"p":"architect+-ural","m":"設計判断が要る。「アーキ判断が要らない」＝直接実行でよい、という判定に使う。","e":"What is the most appropriate architectural fix?","q":"G23"},
+  {"w":"summarization","ja":"要約","n":13,"p":"sum(頂点・総和)+-ar+-ization","m":"総和にまとめること。ここを重ねるほど attribution が落ちる、という論点でよく出る。","e":"Postpones summarization without preventing drift.","q":"G69"},
+  {"w":"consistent","ja":"一貫した","n":13,"p":"con(共に)+sist(立つ)+-ent","m":"ぶれない。inconsistent はその否定で、レビューの品質批判で頻出。","e":"How do you get consistent severity classification?","q":"5.7"},
+  {"w":"latency","ja":"遅延","n":13,"p":"lat(隠れている)+-ency","m":"表に出るまでの潜伏時間。serial latency は「直列にしたことで積み上がる待ち時間」。","e":"Adds serial latency for no reason.","q":"G20"},
+  {"w":"requirement","ja":"要件","n":13,"p":"require+-ment","m":"求められるもの。","e":"Abandons the inline-comment requirement instead of meeting it.","q":"G53"},
+  {"w":"transient","ja":"一時的な・過渡の","n":12,"p":"trans(越えて)+i(行く)+-ent","m":"通り過ぎていく、の意。障害の分類で最頻。transient なら再試行に意味があり、business ルール違反なら何回試しても同じ。","e":"The agent treats this as transient and retries three times, generating a separate compliance alert each time.","q":"G34"},
+  {"w":"attribution","ja":"帰属・出典表示","n":12,"p":"ad(〜へ)+tribut(割り当てる)+-ion","m":"その主張がどの情報源のものかを割り当てること。要約を重ねると真っ先に落ちる。","e":"Attribution is preserved, never reconstructed.","q":"3.8"},
+  {"w":"compliance","ja":"遵守・準拠","n":12,"p":"com(共に)+ply(折る)+-ance","m":"相手に合わせて折れること。model compliance は「モデルが指示に従ってくれること」で、確率的だという文脈で出る。","e":"Relies on probabilistic model compliance.","q":"G1"},
+  {"w":"intermediate","ja":"中間の・中間生成物","n":12,"p":"inter(間)+med(中央)+-iate","m":"途中段階のもの。intermediate results は「途中結果」。","e":"Adds a round trip that may still produce inconsistent intermediate output.","q":"G58"},
+  {"w":"guarantee","ja":"保証","n":12,"p":"warrant の変形（守る）","m":"必ずそうなると約束すること。何を保証し何を保証しないか、が繰り返し問われる。","e":"Relies on self-checking, which is not a guarantee.","q":"G61"},
+  {"w":"resolution","ja":"解決・解像度","n":10,"p":"re(戻す)+solu(ほどく)+-tion","m":"ほどき戻すこと。conflict resolution は「食い違いの解消」。","e":"Your agent achieves 55% first-contact resolution, well below the 80% target.","q":"G3"},
+  {"w":"inconsistent","ja":"一貫しない・ばらつく","n":10,"p":"in(否定)+consistent","m":"同じものを別々に判定してしまう状態。レビュー品質の批判で頻出。","e":"The agent regularly picks the wrong mode and results are inconsistent.","q":"6.7"},
+  {"w":"ambiguity","ja":"曖昧さ","n":10,"p":"ambi(両方)+ag(進む)+-ity","m":"どちらとも取れること。resolving the ambiguity は「曖昧さを解消する」。","e":"Adds emphasis without resolving the ambiguity.","q":"G47"},
+  {"w":"isolated","ja":"隔離された","n":10,"p":"isolate+-ed","m":"切り離された。","e":"Adds machinery and may miss figures discussed outside the isolated sentences.","q":"G60"},
+  {"w":"structural","ja":"構造的な","n":10,"p":"struct(積む)+-ural","m":"表面ではなく構造の側の。structural change は「構造そのものを変える手」。","e":"What is the most reliable structural fix?","q":"6.1"},
+  {"w":"complexity","ja":"複雑さ","n":10,"p":"com(共に)+plex(編む)+-ity","m":"絡み合い。query complexity は「問い合わせの複雑さ」。","e":"Adds selection complexity to solve selection complexity.","q":"3.6"},
+  {"w":"deterministic","ja":"決定論的な","n":9,"p":"de(完全に)+termin(境界)+-istic(〜的な)","m":"terminal（終点）と同じ語根。境界が完全に決まっていて、同じ入力なら必ず同じ結果が出る状態。プロンプトによる指示が確率的なのに対し、コードによる強制はこちら。","e":"Business rules with financial consequences need deterministic guarantees.","q":"1.3"},
+  {"w":"sequential","ja":"逐次の","n":9,"p":"sequ(続く)+-ential","m":"順番に1つずつ。parallel の対語として出る。","e":"Collapses three specialists into one sequential process and eliminates the parallelism entirely.","q":"G20"},
+  {"w":"preserve","ja":"保つ・そのまま残す","n":9,"p":"pre(前もって)+serv(守る)","m":"落とさずに残す。attribution is preserved は「出典が保たれる」。","e":"Duplicates context by hand and does not preserve live session state.","q":"G29"},
+  {"w":"isolation","ja":"隔離","n":8,"p":"in(中へ)+sol(単独)+-ation","m":"island（島）と同根。他から切り離して単独にすること。サブエージェントのコンテキスト隔離が代表例。","e":"Does not change execution isolation.","q":"G43"},
+  {"w":"adaptive","ja":"適応的な","n":8,"p":"ad(〜へ)+apt(合わせる)+-ive","m":"状況に合わせて変える。固定手順（prompt chaining）の対。","e":"Swaps adaptive routing for a brittle keyword table.","q":"G16"},
+  {"w":"ambiguous","ja":"曖昧な・両義的な","n":8,"p":"ambi(両方)+ag(進む)+-ous","m":"どちらへも取れる。ambiguity は名詞。","e":"Improves the documentation of a structure that remains ambiguous.","q":"6.7"},
+  {"w":"distinction","ja":"区別","n":8,"p":"dis(離す)+stinct(刺す)+-ion","m":"刺して分ける。「その区別を定義していない」が批判の型。","e":"Adds a severity layer without defining the underlying distinction.","q":"G56"},
+  {"w":"resolve","ja":"解決する","n":8,"p":"re(戻す)+solv(ほどく)","m":"もつれをほどく。resolve a conflict は食い違いの解消。","e":"Retries a deterministic failure — the sixfold match will not resolve itself.","q":"4.2"},
+  {"w":"drift","ja":"ずれていく・漂流","n":8,"p":"古ノルド語 drifa（押し流される）","m":"じわじわ外れる。configuration drift は「設定が少しずつ食い違っていくこと」。","e":"Postpones summarization without preventing drift.","q":"G69"},
+  {"w":"trace","ja":"追跡する・たどる","n":8,"p":"tract(引く)","m":"跡をたどる。trace back to the source は「出所まで遡る」。","e":"Work incrementally: Grep to find entry points (key functions, imports, error strings), then Read selectively to follow imports and trace flows from those anchors","q":"4.3"},
+  {"w":"delegation","ja":"委譲","n":8,"p":"delegate+-ion","m":"仕事を渡すこと。","e":"Have the coordinator analyze the remaining two sources itself rather than spawning another delegation","q":"G17"},
+  {"w":"escalation","ja":"上位への引き継ぎ","n":8,"p":"escalate+-ion","m":"人間へ渡すこと。","e":"What should the escalation include?","q":"1.5"},
+  {"w":"enforcement","ja":"強制・執行","n":7,"p":"en(〜にする)+force(力)+-ment","m":"力ずくで守らせること。プロンプトによる指示との対比で使われる。","e":"What is the correct enforcement design?","q":"1.3"},
+  {"w":"degradation","ja":"劣化","n":7,"p":"de(下へ)+grad(段)+-ation","m":"段を下る。context degradation は「文脈が長くなるほど精度が落ちる現象」。","e":"Postpones the same degradation at higher cost.","q":"2.10"},
+  {"w":"silently","ja":"黙って・何も言わずに","n":7,"p":"silent+-ly","m":"気づかせずに。silently drops は「黙って落とす」で、ほぼ常に批判語。","e":"Silently drops 2% of the corpus.","q":"6.6"},
+  {"w":"constraints","ja":"制約","n":7,"p":"con(共に)+strain(締める)+-s","m":"締めつけ。スキーマの制約、方針の制約など。","e":"The description reads only “Retrieves order details given a date or identifier,” with no examples or format constraints.","q":"G30"},
+  {"w":"scope","ja":"範囲・スコープ","n":7,"p":"skop(見る)","m":"見える範囲。scoped は「範囲を限った」で、ツールを役割ごとに絞る話で出る。","e":"The scope cannot be known in advance.","q":"G27"},
+  {"w":"invoke","ja":"呼び出す","n":7,"p":"in(中へ)+voc(声)","m":"声をかけて呼ぶ。invoked は過去分詞。","e":"In testing, the coordinator cannot invoke any subagents.","q":"G18"},
+  {"w":"aggregate","ja":"集計する・全体の","n":6,"p":"ag(〜へ)+greg(群れ)+-ate","m":"群れに寄せ集める。aggregate accuracy は「全体をならした精度」で、個別の弱点を隠すという文脈で出る。","e":"A colleague argues the aggregate metric masks important risk.","q":"G75"},
+  {"w":"simultaneously","ja":"同時に","n":6,"p":"simul(同じ)+-taneous+-ly","m":"同じ瞬間に。並列実行の説明で出る。","e":"A single comprehensive pass examining all three aspects simultaneously to capture cross-cutting concerns","q":"G26"},
+  {"w":"malformed","ja":"形が崩れた","n":6,"p":"mal(悪く)+form(形)+-ed","m":"壊れた形。malformed JSON は「構文が崩れた JSON」。","e":"Catches malformed input after the fact, creating avoidable error cycles.","q":"G30"},
+  {"w":"compression","ja":"圧縮","n":6,"p":"com(共に)+press(押す)+-ion","m":"押し込むこと。要約と同じく情報が落ちる工程として扱われる。","e":"Reduces compression events, but the remaining one still strips attribution.","q":"3.8"},
+  {"w":"overhead","ja":"間接的な負荷・オーバーヘッド","n":6,"p":"over(上に)+head(頭)","m":"頭上にのしかかる分。処理そのものではない余分なコスト。","e":"Pays adaptivity overhead on a task with no uncertainty.","q":"4.9"},
+  {"w":"reconciliation","ja":"照合・整合","n":6,"p":"reconcile+-ation","m":"合わせる作業そのもの。","e":"Automates a reconciliation that needs judgment; recency is context, not an override rule.","q":"3.9"},
+  {"w":"dynamic","ja":"動的な","n":6,"p":"dynam(力)+-ic","m":"その場で決まる。dynamic decomposition は「状況を見て分け方を決める」。","e":"Applies dynamic decomposition to a workflow whose structure is already known, adding overhead.","q":"G26"},
+  {"w":"provenance","ja":"来歴・出所","n":5,"p":"pro(前へ)+ven(来る)+-ance","m":"美術品の来歴を指す語がそのまま情報の出所に使われる。どこから来たかを追える状態を保つこと。","e":"Which structural change prevents this provenance loss?","q":"G77"},
+  {"w":"delegate","ja":"委ねる・委譲する","n":5,"p":"de(離す)+leg(送る)+-ate","m":"使者を送り出す。コーディネーターがサブエージェントへ仕事を渡すこと。","e":"A coordinator whose allowedTools omits Task has no mechanism to delegate, however clearly its prompt states the intention.","q":"3.1"},
+  {"w":"subsequent","ja":"後続の","n":5,"p":"sub(下に)+sequ(続く)+-ent","m":"後に続く。subsequent turns は「それ以降のターン」。","e":"Maintain a scratchpad file recording key findings as they are discovered, and have the agent reference it for subsequent questions","q":"2.10"},
+  {"w":"comprehensive","ja":"網羅的な","n":5,"p":"com(共に)+prehend(つかむ)+-ive","m":"まとめてつかむ。「漏れなく」の意で、浅いか深いかとは別の軸。","e":"The web search agent's queries are not comprehensive enough and need to span more creative sectors","q":"G7"},
+  {"w":"termination","ja":"終了","n":5,"p":"termin(境界)+-ation","m":"終わらせること。エージェントループの停止条件の話で出る。","e":"That signal is the designed termination mechanism.","q":"1.1"},
+  {"w":"terminate","ja":"終了させる","n":5,"p":"termin(境界)+-ate","m":"境界で止める。","e":"A colleague proposes an iteration cap: if the loop has not finished after 15 tool calls, terminate with a generic “investigation incomplete” response.","q":"G14"},
+  {"w":"reconcile","ja":"つじつまを合わせる","n":5,"p":"re(再び)+concil(親しくする)","m":"仲直りさせる。数字が reconcile しない＝合計が合わない。","e":"Removing the constraints destroys the structure that downstream systems depend on, and it does nothing about sums that fail to reconcile.","q":"6.4"},
+  {"w":"calibrated","ja":"較正された","n":5,"p":"calibrate+-ed","m":"目盛りが合っている。poorly calibrated は「当てにならない」。","e":"Fails because self-reported confidence is poorly calibrated.","q":"G3"},
+  {"w":"convention","ja":"慣習・規約","n":5,"p":"con(共に)+ven(来る)+-tion","m":"みんなが同じ所へ来る型。coding conventions は「コーディング規約」。","e":"Still relies on the model inferring failure from a prose convention.","q":"6.8"},
+  {"w":"specification","ja":"仕様","n":5,"p":"spec(見る)+-ification","m":"見分けられるように書き下したもの。","e":"This is the specification that has evidently already been tried.","q":"G58"},
+  {"w":"underlying","ja":"根底にある","n":5,"p":"under(下に)+lying(横たわる)","m":"表に出ていない下の層。underlying distinction は「その根っこにある区別」。","e":"Adds token overhead without fixing the underlying ambiguity.","q":"G2"},
+  {"w":"prerequisite","ja":"前提条件","n":4,"p":"pre(前に)+re(強め)+quisit(求める)","m":"先に満たしておくべきこと。プログラム的な prerequisite は、順序をコードで強制すること。","e":"Add a programmatic prerequisite that blocks lookup_order and process_refund until get_customer has returned a verified customer ID","q":"G1"},
+  {"w":"audit","ja":"監査","n":4,"p":"aud(聞く)+-it","m":"もとは「聞き取り」。あとから第三者が確かめられる状態を指す。","e":"This is overly conservative for a weekly, latency-tolerant audit.","q":"G65"},
+  {"w":"inherit","ja":"受け継ぐ","n":4,"p":"in(中へ)+her(相続人)+-it","m":"親から引き継ぐ。「サブエージェントは会話履歴を継承しない」が頻出論点。","e":"Subagents automatically inherit the parent agent's full conversation history, so the coordinator's earlier turns are available without being passed explicitly","q":"4.10"},
+  {"w":"uncertainty","ja":"不確実さ","n":4,"p":"un(否定)+certain+-ty","m":"確かでないこと。","e":"Pays adaptivity overhead on a task with no uncertainty.","q":"4.9"},
+  {"w":"granularity","ja":"粒度","n":3,"p":"gran(粒)+-ular+-ity","m":"粒の細かさ。ツールを細かく割るか大きくまとめるかの議論で出る。","e":"Works at directory granularity but cannot further filter by file type through glob patterns.","q":"G44"},
+  {"w":"calibrate","ja":"較正する・目盛りを合わせる","n":3,"p":"caliber(口径)+-ate","m":"銃の口径を合わせる語。自己申告の確信度は「較正されていない」＝目盛りが狂っている、という指摘で出る。","e":"Have the model output field-level confidence scores, then calibrate review thresholds against a labeled validation set","q":"6.10"},
+  {"w":"parallelism","ja":"並列性","n":3,"p":"para(並んで)+allel(互いに)+-ism","m":"同時に走ること。逐次にすると parallelism を失う、という言い方をする。","e":"Adds parallelism without addressing degradation within a session.","q":"G73"},
+  {"w":"iterative","ja":"反復的な","n":3,"p":"iter(再び)+-ative","m":"同じ工程を回す。iteration は1周のこと。","e":"Which iterative refinement technique fits?","q":"G48"},
+  {"w":"plausible","ja":"もっともらしい","n":3,"p":"plaus(拍手する)+-ible","m":"拍手できる程度に見える。「正しそうだが確かではない」の含みがある。","e":"Use 2–4 targeted examples aimed at the ambiguous scenarios, showing the reasoning for why one action was chosen over plausible alternatives","q":"5.10"},
+  {"w":"persistent","ja":"永続的な・居続ける","n":3,"p":"per(ずっと)+sist(立つ)+-ent","m":"消えずに残る。persistent case-facts block は「毎回渡し続ける事実の塊」。","e":"Mistakes a persistent configuration issue for a per-session prompting task — and nothing “sticks” between sessions.","q":"2.4"},
+  {"w":"detection","ja":"検出","n":3,"p":"de(離す)+tect(覆う)+-ion","m":"覆いを外して見つける。gap detection は「穴の検出」。","e":"Without gap detection there is nothing to aim the second pass at, so it re-covers what was already well covered.","q":"3.5"},
+  {"w":"narrow","ja":"狭い・狭める","n":3,"p":"古英語 nearu","m":"too narrow は「絞りすぎ」で、分解が狭すぎて領域を覆えない、という批判で出る。","e":"The coordinator's task decomposition is too narrow, so the subagent assignments do not cover all relevant domains","q":"G7"},
+  {"w":"widen","ja":"広げる","n":3,"p":"wide+-en","m":"widen the anchor は「アンカーを広げる」＝一意になるまで周辺の文脈を足すこと。","e":"The first move is to widen the anchor: reading the file to find distinguishing surrounding context keeps the edit surgical rather than rewriting the whole file.","q":"G40"},
+  {"w":"annotate","ja":"注記する","n":3,"p":"ad(〜へ)+not(印)+-ate","m":"印を付ける。annotate the conflict は「食い違いを明示的に書き添える」。","e":"Dressing a failure as success removes every downstream opportunity to retry, re-delegate, or at minimum annotate the report with a coverage gap.","q":"G72"},
+  {"w":"static","ja":"静的な・固定の","n":3,"p":"sta(立つ)+-ic","m":"動かない。static routing table は「固定のルーティング表」で、dynamic の対。","e":"Confuses a static tool definition with a runtime result.","q":"1.2"},
+  {"w":"mitigate","ja":"和らげる・緩和する","n":2,"p":"mit(柔らかい)+ag(する)+-ate","m":"消すのではなく軽くする。根治しない対処に使うので、mitigate と書いてあれば「対症療法」と読む。","e":"Mitigate by placing key findings summaries at the start and using explicit section headers","q":"G70"},
+  {"w":"propagate","ja":"伝播させる","n":2,"p":"pro(前へ)+pag(打ち込む)+-ate","m":"杭を打って広げる。エラーを上位へ伝播させるか、その場で握りつぶすかの対比で出る。","e":"Propagate the exception to a top-level handler that terminates the entire research workflow, so no partially-researched report can ever reach the caller","q":"G8"},
+  {"w":"incremental","ja":"漸進的な","n":2,"p":"in(中へ)+cre(増える)+-mental","m":"少しずつ足す。一気にやらない進め方。","e":"Incremental exploration is the pattern: search first to find where the relevant code lives, then read narrowly along the traced paths.","q":"4.3"},
+  {"w":"arbitrary","ja":"恣意的な","n":2,"p":"arbitr(裁定者)+-ary","m":"裁定者の気分次第。「根拠のない」という批判語で、arbitrary cap は「恣意的な上限」。","e":"Makes an arbitrary iteration cap the primary stopping rule.","q":"1.1"},
+  {"w":"brittle","ja":"脆い・折れやすい","n":2,"p":"古英語 brytel（砕ける）","m":"曲がらずに折れる。少し条件が変わると全部壊れる設計を指す。","e":"Swaps adaptive routing for a brittle keyword table.","q":"G16"},
+  {"w":"coherent","ja":"筋の通った","n":2,"p":"co(共に)+her(くっつく)+-ent","m":"全体がくっついている。中身の深さとは別で、浅くても coherent はありうる。","e":"Completed reports are coherent but shallow on some subtopics.","q":"3.5"},
+  {"w":"distinguish","ja":"区別する","n":2,"p":"dis(離す)+stingu(刺す)+-ish","m":"見分ける。distinguishing context は「他と見分けられる文脈」。","e":"Distinguish access failures (backend unreachable or returning an error) from valid empty results (query succeeded, no matches), using the isError flag for the former","q":"G33"},
+  {"w":"substitute","ja":"置き換える・代替","n":2,"p":"sub(下に)+stitut(立てる)","m":"代わりに立てる。「本物の代わりにこれを置く」の含み。","e":"Treats communication as a substitute for correct recovery logic.","q":"1.6"},
+  {"w":"decompose","ja":"分解する","n":2,"p":"de(離す)+compose(組み立てる)","m":"組み立てを解く。","e":"Decompose the three concerns into distinct investigation items, process them in parallel using the shared customer context, then compile a unified response","q":"G22"},
+  {"w":"degrade","ja":"劣化する","n":2,"p":"de(下へ)+grad(段)","m":"段を下る。","e":"Under what condition would this most likely degrade performance?","q":"G15"},
+  {"w":"systematic","ja":"体系的な・系統立った","n":2,"p":"system+-atic","m":"抜けのない手順で。行き当たりばったりの対。","e":"Which schema change best enables systematic false positive analysis?","q":"G64"},
+  {"w":"compels","ja":"強制する","n":2,"p":"com(強め)+pel(駆り立てる)","m":"駆り立てる。tool_choice が「必ずツールを呼ばせる」働きの説明で出る。","e":"This compels a tool call while preserving the model's choice among schemas, which is exactly right for unknown document types that must always yield structured output.","q":"6.2"},
+  {"w":"feasible","ja":"実行可能な","n":1,"p":"fac(なす)+-ible","m":"なし得る。plausible が見た目、feasible が実行可能性。","e":"Would require reworking invocation patterns and is not feasible for all commands.","q":"G25"},
+  {"w":"redundant","ja":"冗長な・重複した","n":1,"p":"red(再び)+und(波打つ)+-ant","m":"同じ波が繰り返す。verbose が「長い」なら redundant は「重複している」。","e":"When tools return results faster than 200ms, making history appending redundant, so the round trip costs more than simply calling the tool again when the value is needed","q":"G15"},
+  {"w":"suppress","ja":"抑え込む","n":1,"p":"sub(下へ)+press(押す)","m":"下へ押さえつける。エラーを suppress すると「握りつぶす」意味になる。","e":"Lower the temperature to make fabrication less creative, on the assumption that fabrication is a sampling artefact and a narrower distribution will suppress it","q":"6.3"},
+  {"w":"throughput","ja":"処理量","n":1,"p":"through(通して)+put(置く)","m":"通り抜ける量。latency（1件の速さ）と対で使う。","e":"How should it spawn them to maximize throughput?","q":"G20"},
+  {"w":"bottleneck","ja":"律速箇所","n":1,"p":"bottle(瓶)+neck(首)","m":"瓶の首。全体の速さを決めている一番細い場所。","e":"Helps at the margin but leaves the serial bottleneck in place.","q":"G22"},
+  {"w":"hierarchy","ja":"階層","n":1,"p":"hier(聖なる)+arch(支配)+-y","m":"もとは聖職者の位階。設定ファイルの階層構造の話で出る。","e":"The hierarchy requires the project-level file to import from user-level files with @import, so the inheritance direction has to be declared explicitly in the project file","q":"G41"},
+  {"w":"inheritance","ja":"継承","n":1,"p":"inherit+-ance","m":"引き継ぎの仕組みそのもの。","e":"The hierarchy requires the project-level file to import from user-level files with @import, so the inheritance direction has to be declared explicitly in the project file","q":"G41"},
+  {"w":"override","ja":"上書きする","n":1,"p":"over(上に)+ride(乗る)","m":"上に乗って覆す。下位の設定が上位を上書きする、という文脈。","e":"Automates a reconciliation that needs judgment; recency is context, not an override rule.","q":"3.9"},
+  {"w":"compress","ja":"圧縮する","n":1,"p":"com(共に)+press(押す)","m":"押し込む。","e":"The mapping travels as structured data through every hop, so the summarization step has something it is required to carry rather than something it is free to compress away.","q":"G77"},
+  {"w":"permit","ja":"許す","n":1,"p":"per(通して)+mit(送る)","m":"通してやる。permits conversational text は「文章での応答を許してしまう」。","e":"Set allowed-tools in the SKILL.md frontmatter to permit only the file-write operations the skill needs, excluding Bash","q":"2.3"},
+  {"w":"tolerant","ja":"許容する","n":1,"p":"toler(耐える)+-ant","m":"耐えられる。latency-tolerant は「遅延を許容できる」＝バッチ向き。","e":"Ask developers to be more tolerant of noise during the tuning period, and agree a date after which the category will be judged on its false-positive rate again","q":"5.6"}
+]
+};
+
+
 /* ---- 模擬試験 ----
    本番は4シナリオ60問120分。ブループリント比率は D1 27 / D2 18 / D3 20 / D4 20 / D5 15 パーセント。
    60問に直すと D1 16 / D2 11 / D3 12 / D4 12 / D5 9 本。
@@ -4159,6 +4351,11 @@ const state = {
   reveal: {},
   scnOpen: true,
   view: 'quiz',
+  vsec: 'sys',        // 語彙タブの中の面  sys 体系 / dict 単語帳 / drill ドリル
+  vq: '',             // 単語帳の絞り込み
+  vhist: {},          // 単語 -> { n, ok, ng, streak }
+  vdrill: null,       // いま出しているドリル
+  vmode: 'e2j',       // e2j 語→義 / j2e 義→語 / cloze 用例の穴埋め
   hist: {},             // qid -> { n, ok, ng, streak, t }
   retry: {},            // qid -> 1  (clear the stored verdict next time it is rendered)
   repeat: false,        // keep re-serving a question until it is mastered
@@ -4270,6 +4467,7 @@ function snapshot() {
     saved: new Date().toISOString(),
     result: state.result,
     hist: state.hist,
+    vhist: state.vhist,
     retry: state.retry,
     settings: {
       lang: state.lang, src: state.src, set: state.set, mock: state.mock,
@@ -4301,6 +4499,7 @@ function loadInto(d) {
   if (!d) return false;
   if (d.result) state.result = d.result;
   if (d.hist) state.hist = d.hist;
+  if (d.vhist) state.vhist = d.vhist;
   state.retry = d.retry || {};
   const g = d.settings;
   if (g) {
@@ -4343,6 +4542,7 @@ function applyUI() {
   if (ep) ep.classList.toggle('on', state.set.indexOf('exam:') === 0);
   const sh = document.getElementById('t-shuffle'); if (sh) sh.setAttribute('aria-pressed', state.shuffle);
   const osh = document.getElementById('t-optshuffle'); if (osh) osh.setAttribute('aria-pressed', state.optShuffle);
+  const vb = document.getElementById('t-vocab'); if (vb) vb.setAttribute('aria-pressed', state.view === 'vocab');
   const rp = document.getElementById('t-repeat'); if (rp) rp.setAttribute('aria-pressed', state.repeat);
   document.querySelectorAll('#lang button').forEach(x => x.setAttribute('aria-pressed', x.dataset.l === state.lang));
 }
@@ -4762,16 +4962,212 @@ function renderResult() {
   document.getElementById('backquiz').addEventListener('click', () => { state.view = 'quiz'; render(); });
 }
 
+/* ---- 語彙 ----
+   本番は英語で受けるので、読めなければ知識があっても落ちる。
+   ここは単語を覚える面ではなく、初見の語を「分解して読む」力を作る面。
+   だから体系（接辞・語根）を先に置き、単語帳をその後ろに置いている。 */
+const vhist = w => state.vhist[w] || { n: 0, ok: 0, ng: 0, streak: 0 };
+const vMastered = w => vhist(w).streak >= state.mastery;
+
+function renderVocab() {
+  const stage = document.getElementById('stage');
+  const tab = (k, label) => '<button data-v="' + k + '" aria-pressed="' + (state.vsec === k) + '">' + label + '</button>';
+  let h = '<div class="vnav">' + tab('sys', '体系') + tab('dict', '単語帳') + tab('drill', 'ドリル') + '</div>';
+
+  if (state.vsec === 'sys') h += vocabSystem();
+  else if (state.vsec === 'dict') h += vocabDict();
+  else h += vocabDrill();
+
+  stage.innerHTML = h;
+  stage.querySelectorAll('.vnav button').forEach(b => b.addEventListener('click', () => {
+    state.vsec = b.dataset.v;
+    if (state.vsec === 'drill' && !state.vdrill) newDrill();
+    save(); render(); scrollTop();
+  }));
+  wireVocab();
+}
+
+/* 例語のチップ。本文に出る語は回数を出し、出ない語は破線にして参考だと分かるようにする */
+function chip(w, n) {
+  return '<span class="chip' + (n ? '' : ' ref') + '">' + esc(w) + (n ? '<i>' + n + '</i>' : '<i>参考</i>') + '</span>';
+}
+
+function vocabSystem() {
+  let h = '<p class="vnote">初見の語を辞書なしで読むための骨。接頭辞が<b>方向</b>、語根が<b>動作</b>、接尾辞が<b>品詞</b>を決める。' +
+    'この3つが分かれば <code>de + termin + istic</code> が「完全に・境界を・〜的な」と読める。' +
+    '数字はこの問題集での出現回数。<span class="chip ref">破線<i>参考</i></span>は本問題集には出ないが、語根の理解のために並べている語。</p>';
+
+  h += '<div class="vhead">接頭辞 ' + VOCAB.prefix.length + '　方向と否定を決める</div><div class="afx">';
+  VOCAB.prefix.forEach(x => {
+    h += '<div class="cell"><span class="a">' + esc(x.a) + '</span><span class="aj">' + esc(x.ja) + '</span>' +
+      '<div class="an">' + esc(x.note) + '</div><div class="ex">' + x.ex.map(e => chip(e.w, e.n)).join('') + '</div></div>';
+  });
+  h += '</div>';
+
+  h += '<div class="vhead">接尾辞 ' + VOCAB.suffix.length + '　品詞を決める</div><div class="afx">';
+  VOCAB.suffix.forEach(x => {
+    h += '<div class="cell"><span class="a">' + esc(x.a) + '</span><span class="aj">' + esc(x.ja) + '</span>' +
+      '<div class="an">' + esc(x.note) + '</div><div class="ex">' + x.ex.map(e => chip(e.w, e.n)).join('') + '</div></div>';
+  });
+  h += '</div>';
+
+  h += '<div class="vhead">語根 ' + VOCAB.roots.length + '　意味の芯</div>';
+  VOCAB.roots.forEach(r => {
+    h += '<div class="root"><div class="rh"><span class="r">' + esc(r.r) + '</span><span class="rj">' + esc(r.ja) + '</span></div>' +
+      '<div class="rn">' + esc(r.note) + '</div><table>';
+    r.fam.forEach(f => {
+      h += '<tr><td class="w">' + esc(f.w) + '</td><td class="lit">' + esc(f.lit) + '</td><td>' + esc(f.ja) + '</td>' +
+        '<td class="wn">' + (f.n ? f.n + '回' : '参考') + '</td></tr>';
+    });
+    h += '</table></div>';
+  });
+  return h;
+}
+
+function vocabDict() {
+  const q = state.vq.trim().toLowerCase();
+  const list = VOCAB.words.filter(x => !q || x.w.includes(q) || x.ja.includes(state.vq.trim()) || x.m.includes(state.vq.trim()));
+  const mst = VOCAB.words.filter(x => vMastered(x.w)).length;
+  let h = '<p class="vnote">出題文から採った ' + VOCAB.words.length + ' 語。多い順。習得 ' + mst + ' / ' + VOCAB.words.length +
+    '。用例はすべて実際の問題文からで、末尾の番号がその問題。</p>' +
+    '<input class="vsearch" id="vq" placeholder="英語でも日本語でも絞り込める" value="' + esc(state.vq) + '">';
+  if (!list.length) h += '<div class="empty">該当なし</div>';
+  list.forEach(x => {
+    h += '<div class="wcard' + (vMastered(x.w) ? ' mst' : '') + '"><div class="wh"><span class="w">' + esc(x.w) + '</span>' +
+      '<span class="j">' + esc(x.ja) + '</span><span class="n">' + x.n + '回' + (vMastered(x.w) ? ' · 習得' : '') + '</span></div>' +
+      '<div class="p">' + esc(x.p) + '</div><div class="m">' + esc(x.m) + '</div>';
+    if (x.e) {
+      const re = new RegExp('(' + x.w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'i');
+      h += '<div class="e">' + esc(x.e).replace(re, '<b>$1</b>') + '<span>Q ' + esc(x.q) + '</span></div>';
+    }
+    h += '</div>';
+  });
+  return h;
+}
+
+/* ---- ドリル ----
+   出題は3型。どれも4択で、誤答は他の語から引く。 */
+function newDrill() {
+  const pool = VOCAB.words.filter(x => state.vmode !== 'cloze' || x.e);
+  const todo = pool.filter(x => !vMastered(x.w));
+  const src = todo.length ? todo : pool;
+  const target = src[Math.floor(Math.random() * src.length)];
+  const others = pool.filter(x => x.w !== target.w);
+  for (let i = others.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = others[i]; others[i] = others[j]; others[j] = t; }
+  const opts = [target, ...others.slice(0, 3)];
+  for (let i = opts.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = opts[i]; opts[i] = opts[j]; opts[j] = t; }
+  state.vdrill = { w: target.w, mode: state.vmode, opts: opts.map(o => o.w), picked: null };
+}
+
+function vocabDrill() {
+  const modes = [['e2j', '語 → 義'], ['j2e', '義 → 語'], ['cloze', '用例の穴埋め']];
+  let h = '<div class="dmode">' + modes.map(([k, l]) =>
+    '<button class="tbtn" data-m="' + k + '" aria-pressed="' + (state.vmode === k) + '">' + l + '</button>').join('') + '</div>';
+
+  const d = state.vdrill;
+  if (!d) { newDrill(); }
+  const D = state.vdrill;
+  const byW = w => VOCAB.words.find(x => x.w === w);
+  const t = byW(D.w);
+  if (!t) { state.vdrill = null; return h + '<div class="empty">出題できませんでした</div>'; }
+
+  h += '<div class="dcard">';
+  if (D.mode === 'e2j') {
+    h += '<div class="dq mono">' + esc(t.w) + '</div><div class="dsub">この語の意味は</div>';
+  } else if (D.mode === 'j2e') {
+    h += '<div class="dq">' + esc(t.ja) + '</div><div class="dsub">これに当たる語は</div>';
+  } else {
+    const re = new RegExp(t.w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'ig');
+    h += '<div class="dq" style="font-size:16px">' + esc(t.e).replace(re, '______') + '</div>' +
+      '<div class="dsub">空欄に入る語は　（Q ' + esc(t.q) + '）</div>';
+  }
+
+  h += '<div class="dopts">';
+  D.opts.forEach((w, i) => {
+    const o = byW(w);
+    const label = D.mode === 'e2j' ? o.ja : o.w;
+    let cls = 'dopt';
+    if (D.picked) {
+      if (w === D.w) cls += ' correct';
+      else if (w === D.picked) cls += ' wrong';
+      else cls += ' dim';
+    }
+    h += '<button class="' + cls + '" data-w="' + esc(w) + '"' + (D.picked ? ' disabled' : '') + '>' +
+      '<span class="k">' + 'ABCD'[i] + '</span><span>' + esc(label) + '</span></button>';
+  });
+  h += '</div>';
+
+  if (D.picked) {
+    const ok = D.ok;                       // pickVocab が決めた値をそのまま出す
+    const hh = vhist(D.w);
+    h += '<div class="verdict ' + (ok ? 'v-ok' : 'v-ng') + '" style="margin:0 -24px -22px"><div class="vhead" style="margin:0;border:0;padding:14px 24px 0">' +
+      '<span class="stamp">' + (ok ? '正解' : '不正解') + '</span><span class="ansline"><b>' + esc(t.w) + '</b>　' + esc(t.ja) + '</span></div>' +
+      '<div class="vbody"><div class="blk"><h4>分解</h4><p>' + esc(t.p) + '</p></div>' +
+      '<div class="blk"><h4>覚え方</h4><p>' + esc(t.m) + '</p></div>' +
+      (t.e ? '<div class="blk"><h4>この問題集での使われ方（Q ' + esc(t.q) + '）</h4><p>' + esc(t.e) + '</p></div>' : '') +
+      '</div></div>';
+    h += '</div><div class="actions" style="padding-left:0;border-top:0">' +
+      '<button class="primary" id="vnext">次の語 →</button>' +
+      '<div class="spacer"></div><span class="dstat">この語 ' + hh.n + ' 回　正解 ' + hh.ok + ' · 誤答 ' + hh.ng +
+      '　連続 ' + hh.streak + (vMastered(D.w) ? '　習得済み' : '') + '</span></div>';
+  } else {
+    const done = VOCAB.words.filter(x => vMastered(x.w)).length;
+    h += '<div class="dstat">習得 ' + done + ' / ' + VOCAB.words.length + '　習得条件はツールバーの設定に従う</div></div>';
+  }
+  return h;
+}
+
+function pickVocab(w) {
+  const D = state.vdrill;
+  if (!D || D.picked) return;
+  D.picked = w;
+  // 正誤はここで1回だけ決めて D.ok に持つ。表示側で計算し直さない。
+  // 以前は表示と記録で別々に判定していたので、記録側だけ壊れても画面は正しく見えた。
+  D.ok = (w === D.w);
+  const hh = state.vhist[D.w] || (state.vhist[D.w] = { n: 0, ok: 0, ng: 0, streak: 0 });
+  hh.n++;
+  if (D.ok) { hh.ok++; hh.streak++; } else { hh.ng++; hh.streak = 0; }
+  save();
+  render();
+}
+
+function wireVocab() {
+  const q = document.getElementById('vq');
+  if (q) {
+    q.addEventListener('input', e => {
+      state.vq = e.currentTarget.value;
+      const at = e.currentTarget.selectionStart;
+      render();
+      const el = document.getElementById('vq');
+      if (el) { el.focus(); try { el.setSelectionRange(at, at); } catch (err) {} }
+    });
+  }
+  document.querySelectorAll('.dmode button').forEach(b => b.addEventListener('click', () => {
+    state.vmode = b.dataset.m; state.vdrill = null; newDrill(); save(); render();
+  }));
+  document.querySelectorAll('.dopt').forEach(b => b.addEventListener('click', () => pickVocab(b.dataset.w)));
+  const nx = document.getElementById('vnext');
+  if (nx) nx.addEventListener('click', () => { newDrill(); render(); scrollTop(); });
+}
+
 function render() {
   renderGauges();
   renderRail();
-  if (state.view === 'result') renderResult(); else renderQuiz();
+  document.querySelector('.body').classList.toggle('novrail', state.view === 'vocab');
+  if (state.view === 'vocab') renderVocab();
+  else if (state.view === 'result') renderResult();
+  else renderQuiz();
 }
 function scrollTop() { try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {} }
 
 /* ---- toolbar ---- */
 function resetClock() { if (!state.timer.on) state.timer.left = pool().length * 120; }
 
+document.getElementById('t-vocab').addEventListener('click', () => {
+  state.view = state.view === 'vocab' ? 'quiz' : 'vocab';
+  if (state.view === 'vocab' && state.vsec === 'drill' && !state.vdrill) newDrill();
+  save(); render(); scrollTop();
+});
 document.getElementById('t-optshuffle').addEventListener('click', e => {
   state.optShuffle = !state.optShuffle;
   e.currentTarget.setAttribute('aria-pressed', state.optShuffle);
