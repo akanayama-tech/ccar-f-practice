@@ -441,7 +441,7 @@ code{font-family:var(--mono);font-size:.92em;background:#F0F4F6;padding:1px 5px;
 </style>
 </head>
 <body>
-<div id="diagbar" style="background:#fef3c7;border-bottom:1px solid #d97706;padding:9px 14px;font-size:.85rem;text-align:center;font-family:-apple-system,'Hiragino Kaku Gothic ProN',sans-serif"><b>まず実力判定</b>（42問・30分・30タスク全網羅） — <a href="./diag.html" style="color:#b45309;font-weight:700">診断を開く →</a> <span style="color:#92400e">外す原因を 型／語彙／未接触／<b>過信</b> に割る。ここから回す順を決める</span></div>
+<div style="background:#f4f6f8;border-bottom:1px solid #d8dde3;padding:6px 14px;font-size:.78rem;text-align:right;color:#666;font-family:-apple-system,'Hiragino Kaku Gothic ProN',sans-serif">上の「問題セット」から <b>★未接触</b> / <b>⚠過信</b> を選べる（2026-09-01 の判定より） ・ <a href="./diag.html" style="color:#2563eb">実力判定をもう一度回す →</a></div>
 <div class="app">
   <header class="top">
     <div class="brand">
@@ -461,8 +461,15 @@ code{font-family:var(--mono);font-size:.92em;background:#F0F4F6;padding:1px 5px;
     <label class="setpick">問題セット
       <select id="srcsel">
         <option value="all">すべて（377問）</option>
+        <optgroup label="2026-09-01 の実力判定より">
+        <option value="gaps">★ 未接触 62問 — 知らないと答えた8タスク（先に読む）</option>
+        <option value="over">⚠ 過信 87問 — 言えると答えて外した11タスク</option>
+        </optgroup>
+        <optgroup label="出所">
         <option value="purcell">Purcell 60問</option>
         <option value="gh">GitHub 77問</option>
+        <option value="bp">公式ブループリント 240問</option>
+        </optgroup>
       </select>
     </label>
     <label class="setpick">シナリオ
@@ -4508,10 +4515,10 @@ function drawExamC() {
 }
 function examByKey(k) { for (let i = 0; i < EXAMS.length; i++) if (EXAMS[i].key === k) return EXAMS[i]; return null; }
 
-// 2026-09-01 の実力判定（42問・30タスク全網羅）で割れた弱点。task 単位で引ける。
+// 2026-09-01 の実力判定（42問・30タスク全網羅）で割れた弱点。Task Statement 単位で引く。
 const DIAG = {
-  gaps: { label: '未接触', hint: '「知らない」と答えた8タスク。先に読む', tasks: ['2.1','2.2','3.6','4.1','4.4','4.5','4.6','5.5'] },
-  over: { label: '過信',   hint: '「言える」と答えて外した11タスク', tasks: ['1.1','1.3','1.7','2.3','2.5','3.1','3.3','3.5','5.2','5.3','5.4'] },
+  gaps: { tasks: ['2.1','2.2','3.6','4.1','4.4','4.5','4.6','5.5'] },
+  over: { tasks: ['1.1','1.3','1.7','2.3','2.5','3.1','3.3','3.5','5.2','5.3','5.4'] },
 };
 const SRCLBL = { purcell: { ja: 'Purcell', en: 'Purcell' }, gh: { ja: 'GitHub', en: 'GitHub' },
   bp: { ja: '公式ブループリント', en: 'Blueprint' } };
@@ -4560,7 +4567,8 @@ function inSet(q) {
   const s = state.set;
   // 模試は60問で成立しているので、出典（Purcell / GitHub）の絞り込みは効かせない
   if (s.indexOf('exam:') === 0) { const ids = examIds(s.slice(5)); return !!ids && ids.indexOf(q.id) >= 0; }
-  if (state.src !== 'all' && q.set !== state.src) return false;
+  if (DIAG[state.src]) { if (DIAG[state.src].tasks.indexOf(q.task) < 0) return false; }
+  else if (state.src !== 'all' && q.set !== state.src) return false;
   if (s === 'all') return true;
   if (s === 'mock') return state.mock.indexOf(q.s) >= 0;        // 旧形式の保存データ
   if (s.indexOf('s:') === 0) return q.s === Number(s.slice(2));
@@ -4789,7 +4797,6 @@ function buildOrder(keepId) {
   let idx = currentExam() ? examOrderIndex() : BANK.map((q, i) => i).filter(i => inSet(BANK[i]));
   if (state.filter === 'wrong') idx = idx.filter(i => tried(BANK[i].id) && !isMastered(BANK[i].id));
   else if (state.filter === 'todo') idx = idx.filter(i => !isMastered(BANK[i].id));
-  else if (DIAG[state.filter]) idx = idx.filter(i => DIAG[state.filter].tasks.indexOf(BANK[i].task) >= 0);
   else if (state.filter !== 'all') idx = idx.filter(i => BANK[i].d === state.filter);
   if (state.shuffle) for (let i = idx.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = idx[i]; idx[i] = idx[j]; idx[j] = t; }
   state.order = idx;
@@ -4854,17 +4861,11 @@ function renderRail() {
     '<span class="dm-top"><span class="dm-n">✗</span><span class="dm-t">つまずいた問題を解き直す</span><span class="dm-w">' + wrong + '</span></span></button>' +
     '<button class="dm" data-f="todo" aria-current="' + (state.filter === 'todo') + '"' + (todo ? '' : ' disabled style="opacity:.4"') + '>' +
     '<span class="dm-top"><span class="dm-n">◻</span><span class="dm-t">未習得（未回答も含む）</span><span class="dm-w">' + todo + '</span></span></button>' +
-    Object.keys(DIAG).map(function (k) {
-      var d = DIAG[k], c = BANK.filter(function (q) { return d.tasks.indexOf(q.task) >= 0; }).length;
-      return '<button class="dm" data-f="' + k + '" aria-current="' + (state.filter === k) + '"' + (c ? '' : ' disabled style="opacity:.4"') + '>' +
-        '<span class="dm-top"><span class="dm-n">' + (k === 'gaps' ? '★' : '⚠') + '</span>' +
-        '<span class="dm-t">' + d.label + ' — ' + d.hint + '</span><span class="dm-w">' + c + '</span></span></button>';
-    }).join('') +
     '</div>';
   rail.innerHTML = h;
   rail.querySelectorAll('.dm').forEach(b => b.addEventListener('click', () => {
     const v = b.dataset.f;
-    state.filter = (v === 'all' || v === 'wrong' || v === 'todo' || DIAG[v]) ? v : Number(v);
+    state.filter = (v === 'all' || v === 'wrong' || v === 'todo') ? v : Number(v);
     state.view = 'quiz';
     buildOrder();
     render();
