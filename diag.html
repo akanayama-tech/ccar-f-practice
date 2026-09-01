@@ -1,0 +1,300 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CCA-F 実力判定 — 30分</title>
+<style>
+  :root{
+    --ink:#1a1a1a; --sub:#666; --line:#d8dde3; --head:#f4f6f8;
+    --hi:#16a34a; --hibg:#dcfce7; --warn:#dc2626; --warnbg:#fee2e2;
+    --now:#d97706; --nowbg:#fef3c7; --info:#2563eb; --infobg:#dbeafe;
+    --vio:#7c3aed; --viobg:#ede9fe;
+  }
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+       color:var(--ink);line-height:1.65;margin:0;padding:20px;max-width:820px;margin-inline:auto;background:#fff}
+  h1{font-size:1.3rem;margin:0 0 2px}
+  .sub{color:var(--sub);font-size:.85rem;margin:0 0 14px}
+  code{background:#eef1f4;padding:1px 5px;border-radius:4px;font-size:.9em;
+       font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+
+  .bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+       background:var(--infobg);border:1px solid var(--info);border-radius:8px;
+       padding:9px 14px;margin:0 0 14px;font-size:.85rem}
+  .bar b{font-size:1.05rem}
+  .bar .spacer{flex:1}
+  .bar .over{color:var(--warn);font-weight:700}
+  button.act{font-family:inherit;font-size:.83rem;padding:6px 13px;border:1px solid var(--info);
+             background:#fff;color:var(--info);border-radius:6px;cursor:pointer}
+  button.act:hover{background:var(--infobg)}
+  button.act.go{background:var(--info);color:#fff;font-weight:700}
+  button.act.danger{border-color:var(--warn);color:var(--warn)}
+
+  details.howto{border:1px solid var(--line);border-radius:8px;margin:0 0 14px;background:var(--head)}
+  details.howto > summary{cursor:pointer;padding:10px 14px;font-size:.87rem;font-weight:700;list-style:none;
+       display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  details.howto > summary::-webkit-details-marker{display:none}
+  details.howto > summary::before{content:"▶";font-size:.7rem;color:var(--sub)}
+  details.howto[open] > summary::before{content:"▼"}
+  details.howto > summary b{flex:0 0 auto;white-space:nowrap}
+  details.howto > summary .tip{font-weight:400;color:var(--sub);font-size:.92em;flex:1 1 auto;min-width:0}
+  .howto .inner{padding:2px 16px 14px;font-size:.85rem;background:#fff;
+       border-top:1px solid var(--line);border-radius:0 0 8px 8px}
+  .howto ul{margin:6px 0;padding-left:19px} .howto li{margin:4px 0}
+
+  .item{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:0 0 10px}
+  .item.done{background:var(--head)}
+  .ihead{font-size:.73rem;color:var(--sub);font-weight:600;margin-bottom:6px;
+         display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .chip{border:1px solid var(--line);border-radius:20px;padding:1px 9px;font-size:.72rem;background:#fff}
+  .chip.goi{background:var(--viobg);border-color:var(--vio);color:#5b21b6}
+  .chip.kata{background:var(--nowbg);border-color:var(--now);color:#92400e}
+  .q{font-size:.97rem;margin:0 0 10px}
+  .term{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem;color:var(--sub);
+        background:var(--head);border-radius:6px;padding:5px 9px;margin:0 0 10px;display:inline-block}
+
+  .step{font-size:.78rem;color:var(--sub);font-weight:700;margin:10px 0 5px}
+  .picks{display:flex;flex-wrap:wrap;gap:6px}
+  .pick{font-family:inherit;font-size:.83rem;padding:8px 12px;border:1px solid var(--line);
+        border-radius:8px;background:#fff;cursor:pointer;color:var(--ink);text-align:left}
+  .pick:hover{background:var(--head)}
+  .pick[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink);font-weight:700}
+  .pick.ok[aria-pressed="true"]{background:var(--hi);border-color:var(--hi)}
+  .pick.ng[aria-pressed="true"]{background:var(--warn);border-color:var(--warn)}
+
+  .ans{display:none;margin-top:11px;padding:11px 14px;background:var(--head);
+       border-left:4px solid var(--info);border-radius:0 8px 8px 0;font-size:.87rem}
+  .ans.on{display:block}
+  .ans .why{display:block;margin-top:7px;color:var(--sub);font-size:.93em}
+
+  .report{border:2px solid var(--ink);border-radius:10px;padding:16px 18px;margin:0 0 14px}
+  .big{font-size:1.9rem;font-weight:700;line-height:1.15}
+  table{width:100%;border-collapse:collapse;font-size:.84rem;margin:12px 0 4px}
+  th,td{border:1px solid var(--line);padding:5px 8px;text-align:left}
+  th{background:var(--head)}
+  td.n{text-align:center;font-variant-numeric:tabular-nums;font-weight:700}
+  .lo{background:var(--warnbg)} .mid{background:var(--nowbg)} .ok2{background:var(--hibg)}
+  .note{color:var(--sub);font-size:.82rem}
+  textarea{width:100%;height:170px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+           font-size:.72rem;border:1px solid var(--line);border-radius:8px;padding:8px}
+  .hide{display:none}
+  @media (max-width:640px){
+    body{padding:10px} h1{font-size:1.15rem}
+    .pick{flex:1 1 100%;padding:11px 13px;min-height:44px}
+    button.act{padding:10px 14px;min-height:44px}
+    .bar{font-size:.8rem;gap:8px} .bar .spacer{flex-basis:100%;height:0}
+    th,td{padding:5px 6px;font-size:.8rem}
+  }
+</style>
+
+<h1>CCA-F 実力判定</h1>
+<p class="sub">42問・30タスク全網羅 ・ 目安 <b>30分</b> ・ <b>答えを開く前に「言えるか」を宣言する</b>のがこのテストの本体</p>
+
+<details class="howto">
+  <summary><b>やり方</b> <span class="tip">— なぜ2段クリックなのか。1分で読める</span></summary>
+  <div class="inner">
+    <ul>
+      <li>これは<b>正誤を当てるテストではない</b>。<b>外す原因</b>を割るためのもの。
+          静的な4択は「型で外した」も「英語の語彙で外した」も同じ✗にしか見えず、区別できない。</li>
+      <li><b>①まず自分の答えを頭の中で言う。</b>それから
+          <b>「言える／語彙が分からない／型が分からない／知らない」</b>を押す。<b>ここは開く前に押す。</b></li>
+      <li><b>②模範解答が開く。</b>読んで <b>「合っていた／違った」</b>を押す。</li>
+      <li>①で「言える」→ ②で「違った」＝<b>過信</b>。これが本番でいちばん効く。
+          落ちた受験記の最大の敗因が「模試の答えを覚えて実力を過信した」だった。</li>
+      <li>正直に押すほど精度が上がる。<b>「わからん」は失点ではなく、いちばん価値の高いデータ</b>。</li>
+      <li>回答は自動保存される。途中で閉じても続きから戻れる。</li>
+      <li>終わったら下に <b>ドメイン別 × 原因別</b>の内訳と、
+          <b>ドリルの回し方の提案</b>、貼り付け用の TSV が出る。</li>
+    </ul>
+  </div>
+</details>
+
+<div class="bar" id="bar"></div>
+<div id="stage"></div>
+<div id="reportArea"></div>
+
+<script>
+const ITEMS = [{"id":"X01","domain":"D1","task":"1.1","kind":"語彙","q":"`stop_reason` が返す2つの値、`tool_use` と `end_turn`。ループを**続ける**のはどっち？ **抜ける**のはどっち？","a":"`tool_use` なら続ける（モデルがツールを呼びたがっている → こちらが実行して結果を返し、次の反復へ）。`end_turn` で抜ける。","why":"エージェントループの制御はここ1点で決まる。本番で最頻出の土台。","term":"stop_reason / tool_use / end_turn"},{"id":"X02","domain":"D1","task":"1.1","kind":"型","q":"「エージェントが暴走しないよう、ループの反復回数の上限を20回にした」。これは**正しい停止機構**か？","a":"違う。上限は安全弁であって停止機構ではない。停止は `stop_reason` を見て決める。反復回数を主たる停止条件にするのは公式ガイドが名指しするアンチパターン。","why":"「自然言語のシグナルで終了を判定する」「assistant のテキストで完了を判定する」も同じく名指しのアンチパターン。"},{"id":"X03","domain":"D1","task":"1.1","kind":"型","q":"ツールの実行結果を、次の反復でモデルに**どう渡す**？ 渡さないと何が起きる？","a":"会話履歴に `tool_result` として積んで渡す。渡さないとモデルは自分が何をしたか分からず、同じツールを呼び直す・前提を捏造する。","why":"`isError: true` を付けて失敗も渡す。握りつぶすとモデルは自己修正できない。"},{"id":"X04","domain":"D1","task":"1.2","kind":"型","q":"coordinator が subagent を4つ呼ぶ構成。**subagent は coordinator の会話履歴を自動で引き継ぐか？**","a":"引き継がない。subagent は独立したコンテキストで動く。だから**必要な情報は coordinator がプロンプトに明示的に載せて渡す**必要がある。","why":"ここを「引き継ぐ」と思っていると、Scenario 3（Multi-Agent Research）の問題を系統的に外す。"},{"id":"X05","domain":"D1","task":"1.2","kind":"型","q":"リサーチの coordinator が、広いテーマを渡されたのに**狭く分解**してしまい調査に抜けが出ている。直すのは coordinator か subagent か、その間の受け渡しか？","a":"coordinator。タスク分解と、どの subagent を呼ぶかの判断は coordinator の責務。あわせて、統合結果に抜けがあれば**再委譲して統合し直す反復**を組む。","why":"「subagent を増やす」「subagent のプロンプトを直す」は原因の層が違う（T3）。"},{"id":"X06","domain":"D1","task":"1.2","kind":"語彙","q":"hub-and-spoke の hub（coordinator）に**全部を通す**理由を2つ。","a":"①観測可能性（どこで何が起きたかが1箇所に集まる）②エラー処理と情報の経路を一貫させられる。subagent 同士を直接つながせない。","why":"「subagent 同士が直接やり取りする」選択肢は誤答の定番。"},{"id":"X07","domain":"D1","task":"1.3","kind":"型","q":"coordinator に subagent を**並列で**走らせたい。何をする？","a":"1回の応答の中で **Task ツールの呼び出しを複数** 出す。あわせて coordinator の `allowedTools` に `Task` が入っている必要がある。","why":"逐次実行との差はレイテンシ。並列にできる設計かを問う出題がある。"},{"id":"X08","domain":"D1","task":"1.4","kind":"型","q":"返金エージェント。「金額が5万円を超えたら必ず人間の承認を挟む」を守らせたい。**プロンプトに書く／コードで止める**のどちら？ なぜ？","a":"コードで止める。プロンプトは確率的で、金銭が絡む不変条件を守り切れない。ツール実装側の事前条件チェックか hook で、満たさなければ拒否する。","why":"**T1（確率で守るな）の本体**。実測で3回外している最大の失点源。"},{"id":"X09","domain":"D1","task":"1.5","kind":"語彙","q":"**PreToolUse** hook と **PostToolUse** hook。それぞれ prevent と detect のどちら？","a":"PreToolUse = **prevent**（実行前に走るので、起こさせないことができる）。PostToolUse = **detect**（実行後なので、起きてから検証・是正するしかない）。","why":"実測で取り違えている。二重返金のような**副作用を止めたい**なら Post では手遅れ。","term":"PreToolUse / PostToolUse"},{"id":"X10","domain":"D1","task":"1.6","kind":"型","q":"1つの依頼に「返品したい」「請求が違う」の2件が混ざっている。エージェントに何をさせる？","a":"分解して1件ずつ処理し、最後に1つの応答へ統合する。片方だけ答えて終わるのが典型的な失敗。","why":"Scenario 1 の頻出。「複数の懸念が入った依頼」への対処を問う。"},{"id":"X11","domain":"D1","task":"1.7","kind":"語彙","q":"`fork_session` と、skill frontmatter の `context: fork`。**この2つの違いは？**","a":"`fork_session` は**セッションそのものを分岐**して、同じ土台から別ルートを2本走らせる。`context: fork` は**skill を独立コンテキストで走らせる**指定で、本筋の会話を汚さないためのもの。別の機構。","why":"実測で**3回**取り違えている。★CC 実務の `subagent_type:\"fork\"` は逆に親を継承するので、試験の語彙をそのまま実装に持ち込まない。","term":"fork_session / context: fork"},{"id":"X12","domain":"D3","task":"3.1","kind":"語彙","q":"CLAUDE.md の階層は3つ。**user / project / directory** のどれが**チームで共有**され、どれが**個人**に閉じる？","a":"project（リポジトリにコミットする）と directory がチーム共有。**user（`~/.claude/CLAUDE.md`）は個人**でバージョン管理されない。","why":"**`~/` が付いたら個人**、が判別の芯。両方向から問われる。"},{"id":"X13","domain":"D3","task":"3.1","kind":"型","q":"巨大になった CLAUDE.md を分割したい。何を使う？","a":"`@import` で別ファイルを取り込む。パッケージごとに関連する規約ファイルだけを選んで取り込める。","why":"「全部を1枚に書く」「コピーして配る」は誤答の定番。"},{"id":"X14","domain":"D3","task":"3.2","kind":"語彙","q":"skill の frontmatter に書ける3つ — `context: fork` / `allowed-tools` / `argument-hint`。それぞれ何を決める？","a":"`context: fork` = 独立コンテキストで走らせる。`allowed-tools` = その skill が使えるツールを絞る（最小権限）。`argument-hint` = 引数の与え方をモデルに示す。","why":"D3 の細かい語彙はここに集中する。","term":"context: fork / allowed-tools / argument-hint"},{"id":"X15","domain":"D3","task":"3.2","kind":"型","q":"`.claude/commands/` に置いたスラッシュコマンドと、`~/.claude/commands/` に置いたもの。**チームメンバーが使えるのはどっち？**","a":"`.claude/commands/`（project スコープ）。`~/` の方は個人にしか効かない。","why":"公式サンプル Q4 がまさにこれ。**`~/` が付いたら個人**。"},{"id":"X16","domain":"D3","task":"3.3","kind":"型","q":"「`src/api/` を触るときだけ API の規約を読ませたい」。どう書く？","a":"`.claude/rules/` にファイルを置き、YAML frontmatter の glob（例 `paths: [\"src/api/**/*\"]`）で対象パスを絞る。該当ファイルを編集するときだけ読み込まれる。","why":"CLAUDE.md は常時ロード、rules は条件付き。**この使い分けを逆にして落ちた受験記がある**。"},{"id":"X17","domain":"D3","task":"3.4","kind":"型","q":"plan mode と direct execution。**plan mode が効くのはどういうタスク？** 効かない（過剰な）のは？","a":"効く: 複数ファイルにまたがる移行、実装方針が複数ありうる新機能、アーキテクチャ判断。過剰: 1ファイルの明白なバグ修正。","why":"「複雑さで選ぶ」が判定軸。全部に plan mode を挟む選択肢は T2。"},{"id":"X18","domain":"D3","task":"3.6","kind":"語彙","q":"CI で Claude Code を回す。**対話モードのままだと何が起きる？** どのフラグを付ける？","a":"入力待ちでハングする。`-p` / `--print`（非対話モード）を付ける。出力を機械で読むなら `--output-format json`、スキーマで縛るなら `--json-schema`。","why":"公式サンプル Q10。存在しない環境変数やフラグを名指す誤答（T5）が並ぶ。","term":"-p / --print / --output-format json / --json-schema"},{"id":"X19","domain":"D3","task":"3.5","kind":"型","q":"出力が思ったものにならない。**反復して詰めるとき、まず何を渡す？**","a":"入力と期待する出力の**実例**。次にテストを先に置いて回す、曖昧なところはこちらから質問させる（interview パターン）。","why":"「プロンプトを長く詳しくする」だけを選ぶと外す。"},{"id":"X20","domain":"D4","task":"4.3","kind":"型","q":"抽出した JSON に、原文に**書いていない値をモデルが埋めてしまう**。スキーマをどう直す？","a":"そのフィールドを **nullable** にして、説明に「無ければ null。推測しない」と書く。**不在は値ではなく型で表す**。","why":"`required` かつ non-nullable は、無い値を**発明させる**。空文字は「空という値がある」であって不在ではない。"},{"id":"X21","domain":"D4","task":"4.3","kind":"型","q":"逆に、**必ず在るはずの値が書き落とされる**。どう直す？","a":"そのフィールドを `required` にする。値が存在するはずかどうかで required と nullable を**逆方向に**使い分ける。","why":"上の問と対。**両方向から出題される**ので、片方だけ覚えると外す。"},{"id":"X22","domain":"D4","task":"4.3","kind":"語彙","q":"`tool_choice` の3つ — `auto` / `any` / 特定ツールの強制。それぞれ何が起きる？","a":"`auto` = 呼ぶかどうかもモデルが決める。`any` = 何かは必ず呼ぶ（どれかはモデルが選ぶ）。特定ツール強制 = そのツールを必ず呼ばせる（構造化出力を確実に取りたいとき）。","why":"構造化出力を tool use で強制する話と直結する。","term":"tool_choice: auto / any / forced"},{"id":"X23","domain":"D4","task":"4.2","kind":"型","q":"few-shot の例を足すのが**正しい場面**と、**やってはいけない場面**。","a":"正しい: 曖昧なケースの**判断基準**を教えるとき、出力形式を揃えたいとき。やってはいけない: **不変条件の強制**（それは T1。コードで守る）。","why":"公式サンプル Q1 の C がまさにこれ。few-shot は確率を上げるだけで保証にならない。"},{"id":"X24","domain":"D4","task":"4.5","kind":"語彙","q":"Message Batches API。**割引率・処理の窓・結果の対応づけ**、そして**できないこと**は？","a":"50%割引、最大24時間の処理窓、`custom_id` で request と response を対応づける。**マルチターンのツール呼び出しには対応していない**。","why":"「できないこと」が誤答（T5）で出る。使い分けの判定軸は**レイテンシ許容度**。","term":"Message Batches API / custom_id"},{"id":"X25","domain":"D4","task":"4.5","kind":"型","q":"夜間バッチのレポート生成と、ユーザーが待っている画面の応答。**どちらを Batches に回す？**","a":"夜間バッチだけ。ユーザーが待っている処理をブロッキングで高レイテンシの API に載せてはいけない。","why":"「コストが半分になるから両方 Batches に」が典型的な誤答。"},{"id":"X26","domain":"D4","task":"4.4","kind":"型","q":"スキーマ検証に落ちた。**再試行で直るもの**と、**直らないもの**の違いは？","a":"形式のズレ（型・書式）は再試行で直る。**情報がそもそも原文に無い**ものは何度やっても直らない（それは nullable で受ける話）。","why":"再試行のときは、原文・失敗した抽出・**具体的な検証エラー**の3点を渡す。"},{"id":"X27","domain":"D4","task":"4.6","kind":"型","q":"14ファイルにまたがる PR のレビューで、単一パスだと見落としが出る。どう組む？","a":"パスを目的で分ける。まずファイル単位、次にファイル横断の統合。**大きなコンテキストで1パス**にしても注意は散ったまま。","why":"公式サンプル Q12。「コンテキスト長を伸ばす」は解決にならない。"},{"id":"X28","domain":"D2","task":"2.1","kind":"型","q":"似た2つのツールを取り違えて呼ばれる。説明文はどちらも1行。**最初の一手は？**","a":"**説明文を厚くする**。扱う入力の形式、例となる問い合わせ、エッジケース、そして「似たツールとの境界」を書く。","why":"公式サンプル Q2。few-shot を足す・ルーティング層を作る・統合する、はどれも原因の層が違うか過剰（T3 / T2）。"},{"id":"X29","domain":"D2","task":"2.2","kind":"語彙","q":"MCP ツールが返す**構造化エラー**に何を入れる？","a":"エラーの種別（一時的 / 検証 / 権限）、**再試行可能か**の真偽値、人間が読める説明。モデルが種別ごとに違う対処をできるようにする。","why":"「エラー文字列だけ返す」「握りつぶす」が誤答。"},{"id":"X30","domain":"D2","task":"2.3","kind":"型","q":"エージェントに渡すツールを絞りたい。**一切使わせない**場合と、**条件付きで使わせる**場合で打ち手が違う。","a":"一切使わせない → `allowedTools` から外す（prevent）。条件付き → PreToolUse hook か plan mode でゲートを置く（prevent だが能力は残す）。**説明文に「使うな」と書くのは統制ではない**。","why":"T4（判断を奪うな）の判定に直結。能力ごと外すか、ゲートを置くかの選択。"},{"id":"X31","domain":"D2","task":"2.4","kind":"語彙","q":"`.mcp.json` と `~/.claude.json`。**どちらがチーム共有**で、秘密情報はどう扱う？","a":"`.mcp.json` が project スコープでリポジトリにコミットしてチーム共有。`~/.claude.json` は個人。秘密は直書きせず**環境変数の展開**（`${ENV}`）で渡す。","why":"両方を同時に有効にできる（チーム共通＋個人の実験用）。","term":"`.mcp.json` / `~/.claude.json` / ${ENV}"},{"id":"X32","domain":"D2","task":"2.4","kind":"型","q":"標準的な連携（GitHub、Slack 等）に MCP サーバが要る。**自作するか、既存を使うか？**","a":"既存のコミュニティ MCP サーバを使う。標準的な連携を自作するのは車輪の再発明。","why":"ガイドが明示している判断。「自作して完全に制御する」は T2。"},{"id":"X33","domain":"D2","task":"2.5","kind":"語彙","q":"built-in tools の **Read / Write / Edit / Bash / Grep / Glob**。Edit と Write の違いは？ Grep と Glob の違いは？","a":"Write = ファイルを丸ごと書く。Edit = 既存ファイルの一部を置換する。Grep = **中身**を検索。Glob = **ファイル名/パス**でマッチ。","why":"「Bash で cat や sed を叩く」は自前実装＝車輪の再発明として誤答になる。","term":"Read / Write / Edit / Bash / Grep / Glob"},{"id":"X34","domain":"D2","task":"2.1","kind":"型","q":"MCP の **resource** と **tool**。使い分けは？","a":"tool = **動作**させるもの（副作用がある、何かを実行する）。resource = **内容のカタログ**として読ませるもの。","why":"「何でも tool にする」設計を選ぶと外す。"},{"id":"X35","domain":"D5","task":"5.1","kind":"語彙","q":"**lost-in-the-middle**。何が起きる？ **指示で直るか？**","a":"長い入力の**中盤が無視される**。「中盤も注意して読め」と指示しても直らない。重要な情報を先頭か末尾へ**位置ごと動かす**か、構造を変える。","why":"「プロンプトで念を押す」を選ぶと外す。位置の問題を指示で解こうとする典型。","term":"lost-in-the-middle"},{"id":"X36","domain":"D5","task":"5.1","kind":"型","q":"22ターンの会話で自動要約が走り、その後**金額が丸まり日付がずれた**。何を直す？","a":"取引の事実（金額・日付・番号・ID）を**要約の外**に置き、毎回そのまま渡す構造にする（case facts / scratchpad）。","why":"「要約プロンプトに『数値は正確に残せ』と書く」は確率頼み。**要約の質を上げる方向は誤り**で、引き継ぎの構造を直すのが正解。"},{"id":"X37","domain":"D5","task":"5.2","kind":"型","q":"エージェントが**簡単な案件までエスカレーションし**、逆に難しい案件を自分で抱え込む。どう直す？","a":"エスカレーションの**基準を明示**する（金額・ポリシー外・進捗不能）。あわせて例を示して較正する。","why":"**モデルの自己申告 confidence で振り分ける**選択肢は誤答。自己申告は較正が甘い。"},{"id":"X38","domain":"D5","task":"5.3","kind":"型","q":"subagent がタイムアウトした。coordinator に**何を返す**？","a":"構造化したエラーの文脈 — 失敗の種別、試みたクエリ、**部分的に取れている結果**。coordinator は部分結果で先へ進み、**カバーできていない範囲を最終成果物に注記**できる。","why":"「エラーを握りつぶして続行」「全体を失敗させる」の両方が誤答。"},{"id":"X39","domain":"D5","task":"5.5","kind":"語彙","q":"**層化抽出（stratified sampling）**を品質監査で使う理由は？","a":"全体の正答率が高くても、**特定の文書種別・特定のフィールドだけ極端に悪い**のを見逃すから。層ごとに切って測る。","why":"「全体で97%だから十分」と書いてある選択肢は罠。","term":"stratified sampling"},{"id":"X40","domain":"D5","task":"5.6","kind":"型","q":"2つの信頼できる情報源が**違う数字**を出している。統合レポートにどう書く？","a":"**両方を出典つきで残す**。勝手にどちらかを選ばない。確立している事実と、争いのある事実を**構造で分ける**。","why":"「新しい方を採用」「多数派を採用」はどちらも誤答。provenance は構造で強制する。"},{"id":"X41","domain":"D4","task":"4.1","kind":"型","q":"コードレビューの自動化で**偽陽性が多すぎて誰も読まなくなった**。プロンプトをどう変える？","a":"何を指摘し何を指摘しないかの**基準を明示**する（重大度の線引き、対象外の列挙）。「良いレビューをして」ではなく判定条件を書く。","why":"Scenario 5 の中心論点。「モデルを賢いものに変える」「もっと丁寧にレビューしろと書く」は誤答。"},{"id":"X42","domain":"D5","task":"5.4","kind":"型","q":"巨大なコードベースを探索させるとコンテキストがすぐ埋まる。何をする？","a":"探索を **subagent に投げて**、返させるのは**構造化した要点だけ**にする。冗長なツール出力をそのまま本筋に積まない。長いセッションでは scratchpad に外部化する。","why":"「コンテキスト長の大きいモデルに変える」は解決にならない（注意は散ったまま）。"}];
+const WEIGHTS = {"D1":{"name":"Agentic Architecture & Orchestration","weight":27},"D2":{"name":"Tool Design & MCP Integration","weight":18},"D3":{"name":"Claude Code Configuration & Workflows","weight":20},"D4":{"name":"Prompt Engineering & Structured Output","weight":20},"D5":{"name":"Context Management & Reliability","weight":15}};
+const BUILT = "2026-09-01 07:32";
+
+const LS = "ccaf-diag-v1";
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+// `code` と **強調** だけ効かせる（原稿の書き味をそのまま出すため）
+const rich = (s) => esc(s).replace(/`([^`]+)`/g,"<code>$1</code>").replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>");
+const fmt = (sec) => Math.floor(sec/60) + ":" + String(Math.round(sec)%60).padStart(2,"0");
+
+const SAY = [
+  ["say",  "言える"],
+  ["goi",  "英語の言葉が分からない"],
+  ["kata", "言葉は分かるが、どうするかが出てこない"],
+  ["no",   "知らない・見たことがない"],
+];
+const HIT = [["ok","合っていた"],["ng","違った"]];
+
+let S = null, tickH = null;
+try { S = JSON.parse(localStorage.getItem(LS) || "null"); } catch(e){}
+if (!S || typeof S !== "object") S = {};
+S.say = S.say || {}; S.hit = S.hit || {}; S.sec = S.sec || 0; S.done = !!S.done;
+const save = () => { try { localStorage.setItem(LS, JSON.stringify(S)); } catch(e){} };
+
+const answered = () => ITEMS.filter(x => S.hit[x.id]).length;
+// 原因の判定。宣言と結果の組み合わせで決まる
+function cause(x){
+  const s = S.say[x.id], h = S.hit[x.id];
+  if (!h) return null;
+  if (h === "ok") return s === "say" ? "clean" : "lucky";   // 言えて合っていた / 曖昧なのに合っていた
+  if (s === "say")  return "over";                          // 言えると思ったのに違った＝過信
+  if (s === "goi")  return "goi";
+  if (s === "kata") return "kata";
+  return "no";
+}
+const CAUSE = { clean:"確実", lucky:"あやふや", over:"過信", goi:"語彙", kata:"型", no:"未接触" };
+
+function tick(){
+  if (document.hidden || S.done) return;
+  S.sec++; save(); paintBar();
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden) paintBar(); });
+
+function paintBar(){
+  const n = answered(), tot = ITEMS.length;
+  const over = S.sec > 30*60;
+  $("bar").innerHTML =
+    '<span>' + (S.done ? "完了" : "判定中") + '</span> <b>'+n+' / '+tot+'</b>' +
+    ' <span class="'+(over?"over":"")+'">経過 <b>'+fmt(S.sec)+'</b></span>' +
+    ' <span class="note">目安 30:00</span><span class="spacer"></span>' +
+    (n === tot && !S.done ? '<button class="act go" id="btnDone">結果を見る</button> ' : "") +
+    (S.done ? '<button class="act go" id="btnDone">結果を出し直す</button> ' : "") +
+    '<button class="act danger" id="btnReset">消してやり直す</button>';
+  const d = $("btnDone"); if (d) d.addEventListener("click", () => { S.done = true; save(); report(); $("reportArea").scrollIntoView({behavior:"smooth"}); });
+  $("btnReset").addEventListener("click", () => {
+    if (!confirm("回答と経過時間をすべて消してやり直します。よろしいですか")) return;
+    try { localStorage.removeItem(LS); } catch(e){}
+    location.reload();
+  });
+}
+
+function draw(){
+  $("stage").innerHTML = ITEMS.map((x, i) => {
+    const s = S.say[x.id], h = S.hit[x.id];
+    const opened = !!s;
+    return '<div class="item'+(h?" done":"")+'" id="i-'+x.id+'">'
+      + '<div class="ihead"><span>'+(i+1)+' / '+ITEMS.length+'</span>'
+      + '<span class="chip">'+esc(x.domain)+' · Task '+esc(x.task)+'</span>'
+      + '<span class="chip '+(x.kind==="語彙"?"goi":"kata")+'">'+esc(x.kind)+'</span>'
+      + (h ? '<span class="chip">'+CAUSE[cause(x)]+'</span>' : "")
+      + '</div>'
+      + '<div class="q">'+rich(x.q)+'</div>'
+      + (x.term ? '<div class="term">'+esc(x.term)+'</div>' : "")
+      + '<div class="step">① 答えを頭の中で言ってから押す（押すと解答が開く）</div>'
+      + '<div class="picks">' + SAY.map(([k,label]) =>
+          '<button class="pick" data-i="'+x.id+'" data-say="'+k+'" aria-pressed="'+(s===k)+'">'+label+'</button>').join("")
+        + '</div>'
+      + '<div class="ans'+(opened?" on":"")+'"><b>解答</b> ' + rich(x.a)
+        + '<span class="why">'+rich(x.why)+'</span>'
+        + '<div class="step">② 自分の答えと突き合わせる</div>'
+        + '<div class="picks">' + HIT.map(([k,label]) =>
+            '<button class="pick '+k+'" data-i="'+x.id+'" data-hit="'+k+'" aria-pressed="'+(h===k)+'">'+label+'</button>').join("")
+          + '</div></div>'
+      + '</div>';
+  }).join("");
+
+  $("stage").querySelectorAll("[data-say]").forEach(b => b.addEventListener("click", () => {
+    S.say[b.dataset.i] = b.dataset.say; save(); draw(); paintBar();
+    const el = $("i-"+b.dataset.i); if (el) el.scrollIntoView({block:"nearest"});
+  }));
+  $("stage").querySelectorAll("[data-hit]").forEach(b => b.addEventListener("click", () => {
+    S.hit[b.dataset.i] = b.dataset.hit; save(); draw(); paintBar();
+    const el = $("i-"+b.dataset.i); if (el) el.scrollIntoView({block:"nearest"});
+  }));
+}
+
+function report(){
+  const done = ITEMS.filter(x => S.hit[x.id]);
+  if (!done.length) { $("reportArea").innerHTML = '<p class="note">まだ1問も終わっていない。</p>'; return; }
+  const c = {}; for (const x of done) { const k = cause(x); c[k] = (c[k]||0)+1; }
+  const okN = (c.clean||0) + (c.lucky||0);
+  const rate = okN / done.length;
+
+  // ドメイン別
+  const dom = {};
+  for (const x of done) {
+    const d = dom[x.domain] = dom[x.domain] || {n:0, ok:0, over:0, goi:0, kata:0, no:0, lucky:0};
+    d.n++; const k = cause(x);
+    if (k==="clean"||k==="lucky") d.ok++;
+    if (k!=="clean") d[k==="over"?"over":k==="goi"?"goi":k==="kata"?"kata":k==="no"?"no":"lucky"]++;
+  }
+  const cls = (r) => r < 0.6 ? "lo" : r < 0.8 ? "mid" : "ok2";
+
+  let h = '<div class="report">';
+  h += '<div class="big">'+okN+' / '+done.length+' ＝ '+Math.round(rate*100)+'%</div>';
+  h += '<p class="note">使った時間 '+fmt(S.sec)+'（目安 30:00）。'
+     + 'これは合否の予測ではない。<b>何が足りないか</b>の地図。</p>';
+
+  h += '<table><tr><th>原因</th><th>件数</th><th>意味と手当て</th></tr>'
+    + '<tr class="ok2"><td>確実</td><td class="n">'+(c.clean||0)+'</td><td>言えて合っていた。触らなくていい</td></tr>'
+    + '<tr class="mid"><td>あやふや</td><td class="n">'+(c.lucky||0)+'</td><td>迷ったが合っていた。<b>本番の2択で落ちる層</b>。ドリルで潰す</td></tr>'
+    + '<tr class="lo"><td><b>過信</b></td><td class="n">'+(c.over||0)+'</td><td><b>言えると思ったのに違った。いちばん危ない</b>。ここは最優先で埋める</td></tr>'
+    + '<tr class="lo"><td>語彙</td><td class="n">'+(c.goi||0)+'</td><td>英語の術語を知らない。<b>暗記で埋まる＝安い</b>。英→英で覚え直す</td></tr>'
+    + '<tr class="lo"><td>型</td><td class="n">'+(c.kata||0)+'</td><td>言葉は分かるが判断が出てこない。<b>ドリルの量が要る</b></td></tr>'
+    + '<tr class="lo"><td>未接触</td><td class="n">'+(c.no||0)+'</td><td>そもそも知らない。<b>ガイドの該当タスクを読むのが先</b></td></tr>'
+    + '</table>';
+
+  h += '<table><tr><th>ドメイン</th><th>重み</th><th>正</th><th>出題</th><th>率</th>'
+     + '<th>過信</th><th>語彙</th><th>型</th><th>未接触</th></tr>';
+  for (const d of ["D1","D2","D3","D4","D5"]) {
+    if (!dom[d]) continue; const v = dom[d], r = v.ok/v.n;
+    h += '<tr class="'+cls(r)+'"><td>'+d+' '+esc(WEIGHTS[d].name)+'</td><td class="n">'+WEIGHTS[d].weight+'%</td>'
+      + '<td class="n">'+v.ok+'</td><td class="n">'+v.n+'</td><td class="n">'+Math.round(r*100)+'%</td>'
+      + '<td class="n">'+v.over+'</td><td class="n">'+v.goi+'</td><td class="n">'+v.kata+'</td><td class="n">'+v.no+'</td></tr>';
+  }
+  h += '</table>';
+
+  // 手当ての順番。重み × 落とし方 で並べる
+  const prio = Object.entries(dom).map(([d,v]) => ({
+    d, weight: WEIGHTS[d].weight, miss: v.n - v.ok,
+    score: WEIGHTS[d].weight * (v.n - v.ok) / v.n, v,
+  })).sort((a,b) => b.score - a.score);
+  h += '<p style="margin:14px 0 4px"><b>この順で潰す</b>（重み × 落とした割合）</p><ol style="margin:4px 0;padding-left:22px;font-size:.88rem">';
+  for (const p of prio) {
+    if (p.miss === 0) continue;
+    const lead = p.v.goi >= p.v.kata && p.v.goi > 0 ? "落とし方は<b>語彙</b>寄り。英→英の想起を先に"
+              : p.v.kata > 0 ? "落とし方は<b>型</b>寄り。ドリルの量で潰す"
+              : p.v.no > 0 ? "<b>未接触</b>が残っている。ガイドの該当タスクを先に読む" : "";
+    h += '<li><b>'+p.d+'</b>（重み '+p.weight+'%・'+p.miss+'/'+p.v.n+' 落とし）— '+lead
+      + (p.v.over ? '　<b style="color:var(--warn)">過信 '+p.v.over+'件</b>' : "") + '</li>';
+  }
+  h += '</ol>';
+
+  // 落とした task statement を名指しする（ドリルの生成はここを狙う）
+  const missed = done.filter(x => cause(x) !== "clean");
+  if (missed.length) {
+    const byTask = {};
+    for (const x of missed) (byTask[x.domain+" · Task "+x.task] = byTask[x.domain+" · Task "+x.task] || []).push(CAUSE[cause(x)]);
+    h += '<p style="margin:14px 0 4px"><b>取りこぼした Task Statement</b>（'+Object.keys(byTask).length+' 本／全30本）</p>'
+      + '<p class="note" style="line-height:1.9">'
+      + Object.entries(byTask).sort().map(([k,v]) => '<span class="chip">'+esc(k)+' <b>'+v.join("・")+'</b></span>').join(" ")
+      + '</p>';
+  }
+
+  h += '<p style="margin-top:14px"><button class="act" id="btnTsv">TSV を書き出す（drill-log に貼る）</button></p>';
+  h += '<textarea id="tsv" class="hide" readonly></textarea></div>';
+  $("reportArea").innerHTML = h;
+
+  $("btnTsv").addEventListener("click", () => {
+    const ta = $("tsv"); ta.classList.remove("hide");
+    const d = new Date().toISOString().slice(0,10);
+    const rows = [["date","qid","domain","task","kind","say","hit","cause"].join("\t")];
+    for (const x of ITEMS) {
+      if (!S.hit[x.id]) continue;
+      rows.push([d, x.id, x.domain, x.task, x.kind, S.say[x.id], S.hit[x.id], CAUSE[cause(x)]].join("\t"));
+    }
+    rows.push(["#", "経過", fmt(S.sec), "正", okN + "/" + done.length].join("\t"));
+    ta.value = rows.join("\n"); ta.select();
+  });
+}
+
+draw(); paintBar();
+if (!S.done) tickH = setInterval(tick, 1000);
+if (S.done) report();
+</script>
