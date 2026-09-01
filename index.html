@@ -4508,6 +4508,11 @@ function drawExamC() {
 }
 function examByKey(k) { for (let i = 0; i < EXAMS.length; i++) if (EXAMS[i].key === k) return EXAMS[i]; return null; }
 
+// 2026-09-01 の実力判定（42問・30タスク全網羅）で割れた弱点。task 単位で引ける。
+const DIAG = {
+  gaps: { label: '未接触', hint: '「知らない」と答えた8タスク。先に読む', tasks: ['2.1','2.2','3.6','4.1','4.4','4.5','4.6','5.5'] },
+  over: { label: '過信',   hint: '「言える」と答えて外した11タスク', tasks: ['1.1','1.3','1.7','2.3','2.5','3.1','3.3','3.5','5.2','5.3','5.4'] },
+};
 const SRCLBL = { purcell: { ja: 'Purcell', en: 'Purcell' }, gh: { ja: 'GitHub', en: 'GitHub' },
   bp: { ja: '公式ブループリント', en: 'Blueprint' } };
 const smap = {}; SCENARIOS.forEach(s => smap[s.n] = s);
@@ -4784,6 +4789,7 @@ function buildOrder(keepId) {
   let idx = currentExam() ? examOrderIndex() : BANK.map((q, i) => i).filter(i => inSet(BANK[i]));
   if (state.filter === 'wrong') idx = idx.filter(i => tried(BANK[i].id) && !isMastered(BANK[i].id));
   else if (state.filter === 'todo') idx = idx.filter(i => !isMastered(BANK[i].id));
+  else if (DIAG[state.filter]) idx = idx.filter(i => DIAG[state.filter].tasks.indexOf(BANK[i].task) >= 0);
   else if (state.filter !== 'all') idx = idx.filter(i => BANK[i].d === state.filter);
   if (state.shuffle) for (let i = idx.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = idx[i]; idx[i] = idx[j]; idx[j] = t; }
   state.order = idx;
@@ -4848,11 +4854,17 @@ function renderRail() {
     '<span class="dm-top"><span class="dm-n">✗</span><span class="dm-t">つまずいた問題を解き直す</span><span class="dm-w">' + wrong + '</span></span></button>' +
     '<button class="dm" data-f="todo" aria-current="' + (state.filter === 'todo') + '"' + (todo ? '' : ' disabled style="opacity:.4"') + '>' +
     '<span class="dm-top"><span class="dm-n">◻</span><span class="dm-t">未習得（未回答も含む）</span><span class="dm-w">' + todo + '</span></span></button>' +
+    Object.keys(DIAG).map(function (k) {
+      var d = DIAG[k], c = BANK.filter(function (q) { return d.tasks.indexOf(q.task) >= 0; }).length;
+      return '<button class="dm" data-f="' + k + '" aria-current="' + (state.filter === k) + '"' + (c ? '' : ' disabled style="opacity:.4"') + '>' +
+        '<span class="dm-top"><span class="dm-n">' + (k === 'gaps' ? '★' : '⚠') + '</span>' +
+        '<span class="dm-t">' + d.label + ' — ' + d.hint + '</span><span class="dm-w">' + c + '</span></span></button>';
+    }).join('') +
     '</div>';
   rail.innerHTML = h;
   rail.querySelectorAll('.dm').forEach(b => b.addEventListener('click', () => {
     const v = b.dataset.f;
-    state.filter = (v === 'all' || v === 'wrong' || v === 'todo') ? v : Number(v);
+    state.filter = (v === 'all' || v === 'wrong' || v === 'todo' || DIAG[v]) ? v : Number(v);
     state.view = 'quiz';
     buildOrder();
     render();
