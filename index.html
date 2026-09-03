@@ -452,6 +452,9 @@ code{font-family:var(--mono);font-size:.92em;background:#F0F4F6;padding:1px 5px;
   font-weight:600;cursor:pointer;font-family:inherit}
 .ck-next:hover{background:#e8eef2}
 .ck-foot{display:flex;justify-content:center;margin:6px 0 28px}
+.tbtn.tsel{font-family:inherit;cursor:pointer;background:var(--card);color:var(--muted);
+  padding:5px 8px;line-height:1.5}
+.tbtn.tsel:disabled{opacity:.45;cursor:default}
 .rv-band{font-size:11.5px;font-weight:600;letter-spacing:.06em;padding:7px 16px;border-bottom:1px solid #e6ebef}
 .rv-sec.eng>.rv-band{background:#eef4fb;color:#1e4976}
 .rv-sec.ai>.rv-band{background:#f2f0fb;color:#4c3a8c}
@@ -634,7 +637,12 @@ code{font-family:var(--mono);font-size:.92em;background:#F0F4F6;padding:1px 5px;
     <button class="tbtn" id="t-timer">試験時間を計る</button>
     <button class="tbtn" id="t-shuffle" aria-pressed="false">出題順をシャッフル</button>
     <button class="tbtn" id="t-optshuffle" aria-pressed="true">選択肢もシャッフル</button>
-    <button class="tbtn" id="t-hold" aria-pressed="true">10問まとめて採点</button>
+    <button class="tbtn" id="t-hold" aria-pressed="true">まとめて採点</button>
+    <select class="tbtn tsel" id="chunksel" aria-label="何問ずつ区切って採点するか">
+      <option value="10">10問ずつ</option>
+      <option value="20">20問ずつ</option>
+      <option value="0">選んだ範囲すべて</option>
+    </select>
     <button class="tbtn rep" id="t-repeat" aria-pressed="false">正解するまで反復</button>
     <label class="setpick">習得条件
       <select id="msel">
@@ -4692,7 +4700,11 @@ const state = {
   retry: {},            // qid -> 1  (clear the stored verdict next time it is rendered)
   repeat: false,        // keep re-serving a question until it is mastered
   mastery: 1,           // correct answers in a row required to count as mastered
-  hold: true,           // 10問を通しで解いてからまとめて採点する（ドリル形式）
+  hold: true,           // 通しで解いてからまとめて採点する（ドリル形式）
+  chunk: 10,            // 何問ずつで区切って採点するか。0 = 選んだ範囲すべてを1単位に
+  page: 0,              // いま何セット目か（0起点）
+  full: 0,              // 割る前の問数。ページ数の分母
+  unit: null,           // いま解いている単位のキー。切り替わりの検出に使う
   graded: {},           // セットID -> 1  採点済みのセット
   timer: { on: false, left: 120 * 60 }
 };
@@ -4811,6 +4823,7 @@ function snapshot() {
       lang: state.lang, src: state.src, set: state.set, mock: state.mock,
       shuffle: state.shuffle, optShuffle: state.optShuffle, repeat: state.repeat, mastery: state.mastery,
       filter: state.filter, hold: state.hold, graded: state.graded,
+      chunk: state.chunk, page: state.page, unit: state.unit,
       cursorId: state.order.length ? BANK[state.order[state.cursor]].id : null
     }
   };
@@ -4852,6 +4865,9 @@ function loadInto(d) {
     if (g.mastery) state.mastery = Number(g.mastery);
     if (g.filter !== undefined) state.filter = g.filter;
     state.hold = g.hold !== false;               // 既定はON（ドリル形式）
+    state.chunk = g.chunk === undefined ? 10 : Number(g.chunk);
+    state.page = g.page || 0;
+    state.unit = g.unit || null;
     state.graded = g.graded || {};
   }
   applyUI();
@@ -4885,6 +4901,7 @@ function applyUI() {
   const osh = document.getElementById('t-optshuffle'); if (osh) osh.setAttribute('aria-pressed', state.optShuffle);
   const vb = document.getElementById('t-vocab'); if (vb) vb.setAttribute('aria-pressed', state.view === 'vocab');
   const hd = document.getElementById('t-hold'); if (hd) hd.setAttribute('aria-pressed', state.hold);
+  const cs = document.getElementById('chunksel'); if (cs) { cs.value = String(state.chunk); cs.disabled = !state.hold; }
   const rp = document.getElementById('t-repeat'); if (rp) rp.setAttribute('aria-pressed', state.repeat);
   document.querySelectorAll('#lang button').forEach(x => x.setAttribute('aria-pressed', x.dataset.l === state.lang));
 }
@@ -4944,7 +4961,24 @@ function buildOrder(keepId) {
   else if (state.filter === 'todo') idx = idx.filter(i => !isMastered(BANK[i].id));
   else if (state.filter !== 'all') idx = idx.filter(i => BANK[i].d === state.filter);
   if (state.shuffle) for (let i = idx.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = idx[i]; idx[i] = idx[j]; idx[j] = t; }
+  state.full = idx.length;
+  // 出題の選び方が変わったら1セット目に戻す（同じ選び方のままなら現在地を保つ）
+  if (state._sig !== unitSig()) { state._sig = unitSig(); state.page = 0; }
+  if (chunkOn()) {
+    const np = Math.max(1, Math.ceil(idx.length / state.chunk));
+    if (keepId) { const fa = idx.findIndex(i => BANK[i].id === keepId); if (fa >= 0) state.page = Math.floor(fa / state.chunk); }
+    state.page = Math.min(Math.max(0, state.page), np - 1);
+    idx = idx.slice(state.page * state.chunk, state.page * state.chunk + state.chunk);
+  } else if (!currentLot() && !currentExam()) { state.page = 0; }
   state.order = idx;
+  // 新しい単位に入ったら、前回の正誤を持ち越さない。
+  // 持ち越すと「もう10/10問答え済み」と数えて、1問目の回答でいきなり採点に飛ぶ。
+  // 長期の記録は state.hist が持っているので、ここで消えるのは今回の答え合わせ分だけ。
+  const uk = setKey();
+  if (state.hold && uk && uk !== state.unit) {
+    state.unit = uk;
+    if (!state.graded[uk]) for (const i of idx) delete state.result[BANK[i].id];
+  }
   const at = keepId ? idx.findIndex(i => BANK[i].id === keepId) : -1;
   state.cursor = at >= 0 ? at : 0;
 }
@@ -5137,10 +5171,27 @@ function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(
 
 
 /* ---- まとめて採点（ドリル形式） ---- */
-// いま解いているのが「ひとまとまり」か。ロット（10問）と模試（60問）が該当する。
+// 「ひとまとまり」＝まとめて答え合わせする単位。3種類ある。
+//   exam:  模試（60問。本番同型なので割らない）
+//   lot:   10問セット
+//   pg:    それ以外（全377問・ドメイン・シナリオ・出所…）を state.chunk 問ずつに割ったもの
+// ★2026-09-03 の初版は lot と exam しか単位として扱っておらず、**既定の「全377問」では
+//   まとめて採点が一度も効いていなかった**（開いた直後は1問ごとに答えが出ていた）。
+//   トグルは押された状態で出ていたので、画面は「効いている」と言い続けていた。
+function chunkOn() {
+  if (state.set.indexOf('exam:') === 0) return false;   // 模試は60問で1単位
+  if (state.src.indexOf('lot:') === 0) return false;    // ロットは10問で1単位
+  return !!state.hold && state.chunk > 0;
+}
+function unitSig() { return state.src + '|' + state.set + '|' + state.filter + '|' + state.chunk; }
+function pageCount() {
+  if (!chunkOn()) return 1;
+  return Math.max(1, Math.ceil((state.full || state.order.length) / state.chunk));
+}
 function setKey() {
   if (state.set.indexOf('exam:') === 0) return state.set;
   if (state.src.indexOf('lot:') === 0) return state.src;
+  if (state.hold) return 'pg:' + unitSig() + '|' + state.page;
   return null;
 }
 function holdActive() {
@@ -5155,11 +5206,28 @@ function gradeSet() {
   state.view = 'result';
   save();
 }
+// いま出ている単位の問題。pool() ではなく state.order で数える
+// （pool() は割る前の母集合なので、10問ずつに割ると分母がずれる）
+function unitQs() {
+  var r = [];
+  for (var i = 0; i < state.order.length; i++) r.push(BANK[state.order[i]]);
+  return r;
+}
 function answeredInSet() {
-  var qs = pool();
-  var n = 0;
+  var qs = unitQs(), n = 0;
   for (var i = 0; i < qs.length; i++) if (state.result[qs[i].id]) n++;
   return { done: n, total: qs.length };
+}
+function srcLabel() {
+  var el = document.getElementById('srcsel');
+  var o = el && el.selectedOptions && el.selectedOptions[0];
+  return o ? o.textContent.trim() : '出題';
+}
+function unitTitle() {
+  if (state.set.indexOf('exam:') === 0) { var e = currentExam(); return e ? (e.ja || e.label || '模試') : '模試'; }
+  var L = currentLot(); if (L) return L.key;
+  var np = pageCount();
+  return srcLabel() + (np > 1 ? '　' + (state.page + 1) + '/' + np + 'セット目' : '');
 }
 // ロットの並び順は LOTMAP の定義順（build 時に弱い順で並べてある）
 function lotOrder() { return Object.keys(LOTMAP); }
@@ -5168,11 +5236,51 @@ function nextLotKey() {
   var ks = lotOrder(), i = ks.indexOf(state.src.slice(4));
   return (i >= 0 && i + 1 < ks.length) ? ks[i + 1] : null;
 }
+// 次の単位。ロットなら次のロット、割っているなら次のページ
+function nextUnit() {
+  if (state.src.indexOf('lot:') === 0) { var k = nextLotKey(); return k ? { kind: 'lot', key: k } : null; }
+  if (chunkOn() && state.page + 1 < pageCount()) return { kind: 'page', page: state.page + 1 };
+  return null;
+}
+function nextUnitLabel() {
+  var u = nextUnit(); if (!u) return null;
+  return u.kind === 'lot' ? u.key : ((u.page + 1) + '/' + pageCount() + 'セット目');
+}
+function nextUnitSize() {
+  var u = nextUnit(); if (!u) return 0;
+  if (u.kind === 'lot') { var L = LOTMAP[u.key]; return L ? L.ids.length : 10; }
+  return Math.min(state.chunk, (state.full || 0) - u.page * state.chunk);
+}
 function goToLot(key) {
   state.src = 'lot:' + key;
   state.view = 'quiz';
   state.cursor = 0;
   state.filter = 'all';
+  buildOrder();
+  save(); render(); scrollTop();
+}
+// 採点したら、まずスコアを見せる。ページ先頭に送ると統計とツールバーしか見えない
+// （iPhone で実測 858px 下に出ていた＝10問解き終えて最初に見たいものが画面外だった）
+function scrollToCheck() {
+  try {
+    var e = document.querySelector('.ck-hero');
+    if (e && e.scrollIntoView) { e.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+  } catch (err) {}
+  scrollTop();
+}
+function goNextUnit() {
+  var u = nextUnit(); if (!u) return;
+  if (u.kind === 'lot') return goToLot(u.key);
+  state.page = u.page;
+  state.view = 'quiz';
+  state.cursor = 0;
+  buildOrder();
+  save(); render(); scrollTop();
+}
+function setChunk(n) {
+  state.chunk = Number(n) || 0;
+  state.page = 0;
+  state.view = 'quiz';
   buildOrder();
   save(); render(); scrollTop();
 }
@@ -5327,7 +5435,7 @@ function renderQuiz() {
     save(); renderQuiz();
   }));
   const gn = document.getElementById('gradenow');
-  if (gn) gn.addEventListener('click', () => { gradeSet(); render(); scrollTop(); });
+  if (gn) gn.addEventListener('click', () => { gradeSet(); render(); scrollToCheck(); });
   document.getElementById('prev').addEventListener('click', () => { state.cursor--; render(); });
   document.getElementById('fwd').addEventListener('click', () => { state.cursor++; render(); });
 }
@@ -5357,7 +5465,7 @@ function submit(q) {
   if (holdActive()) {
     // 正誤を出さずに次へ。全問答え終わっていたら採点へ
     const st = answeredInSet();
-    if (st.done >= st.total || state.cursor >= state.order.length - 1) { gradeSet(); render(); scrollTop(); }
+    if (st.done >= st.total || state.cursor >= state.order.length - 1) { gradeSet(); render(); scrollToCheck(); }
     else { state.cursor++; render(); scrollTop(); }
     return;
   }
@@ -5498,22 +5606,26 @@ function reviewCard(q, n) {
 }
 
 function reviewCards() {
-  var lot = currentLot();
-  if (!lot) return '';
-  var qs = BANK.filter(function (q) { return lot.ids.indexOf(q.id) >= 0; });
+  // ロットだけでなく、いま解いている単位（10問ずつに割ったページ・模試も含む）で開く
+  var k = setKey();
+  if (!k) return '';
+  if (state.hold && !state.graded[k]) return '';   // 採点前は開かない
+  var qs = unitQs();
+  if (!qs.length) return '';
   var done = qs.filter(function (q) { return state.result[q.id]; });
   if (!done.length) return '';
   var ok = done.filter(function (q) { return state.result[q.id].ok; }).length;
   var pct = Math.round(ok / done.length * 100);
   var nJa = qs.filter(function (q) { return q.ja && q.ja.stem; }).length;
-  var nxt = nextLotKey();
+  var nxt = nextUnitLabel();
+  var nsz = nextUnitSize();
 
   // ① 答え合わせ。まず何問取れたかを出す
   var h = '<div class="ck-hero' + (pct >= 75 ? ' pass' : '') + '">' +
     '<div class="ck-n">' + ok + '<small>/' + done.length + '</small></div>' +
-    '<div class="ck-b"><div class="ck-t">' + esc(lot.key) + ' の答え合わせ</div>' +
+    '<div class="ck-b"><div class="ck-t">' + esc(unitTitle()) + ' の答え合わせ</div>' +
     '<div class="ck-s">正答率 ' + pct + '%' + (pct >= 75 ? '　合格ライン（75%）を超えている' : '　合格ラインは 75%') + '</div></div>' +
-    (nxt ? '<button class="ck-next" id="nextlot">次の10問へ　' + esc(nxt) + ' →</button>'
+    (nxt ? '<button class="ck-next" id="nextlot">次の' + nsz + '問へ　' + esc(nxt) + ' →</button>'
          : '<span class="ck-s">これが最後のセット</span>') + '</div>';
 
   // ② 1問ずつの解説。英語の勉強と中身の勉強を面で分ける
@@ -5521,14 +5633,14 @@ function reviewCards() {
     '<b>中身の解説</b>（なぜその答えか・外した型）に分けてある。' +
     '訳が入っているのはこのセットの ' + nJa + '/' + qs.length + '問。</div>' +
     '<div class="rv-wrap">' + qs.map(function (q, i) { return reviewCard(q, i + 1); }).join('') + '</div>';
-  if (nxt) h += '<div class="ck-foot"><button class="ck-next" id="nextlot2">次の10問へ　' + esc(nxt) + ' →</button></div>';
+  if (nxt) h += '<div class="ck-foot"><button class="ck-next" id="nextlot2">次の' + nsz + '問へ　' + esc(nxt) + ' →</button></div>';
   return h;
 }
 
 function wireNextLot() {
   ['nextlot', 'nextlot2'].forEach(function (id) {
     var b = document.getElementById(id);
-    if (b) b.addEventListener('click', function () { var k = nextLotKey(); if (k) goToLot(k); });
+    if (b) b.addEventListener('click', function () { goNextUnit(); });
   });
 }
 function renderResult() {
@@ -5853,8 +5965,10 @@ document.getElementById('t-optshuffle').addEventListener('click', e => {
 document.getElementById('t-hold').addEventListener('click', e => {
   state.hold = !state.hold;
   e.currentTarget.setAttribute('aria-pressed', state.hold);
-  save(); render();
+  state.page = 0;
+  buildOrder(); save(); render(); scrollTop();
 });
+document.getElementById('chunksel').addEventListener('change', e => { setChunk(e.currentTarget.value); });
 document.getElementById('t-repeat').addEventListener('click', e => {
   state.repeat = !state.repeat;
   e.currentTarget.setAttribute('aria-pressed', state.repeat);
