@@ -505,10 +505,29 @@ code{font-family:var(--mono);font-size:.92em;background:#F0F4F6;padding:1px 5px;
   .rv-voc{grid-template-columns:1fr;gap:2px 0}
   .rv-voc dd{margin-bottom:6px}
 }
+html{scroll-padding-top:42px}
+#pgbar{position:sticky;top:0;z-index:200;display:flex;align-items:center;gap:10px;
+  background:var(--card);border-bottom:1px solid var(--line);padding:5px 20px;
+  font-family:var(--mono);pointer-events:none}
+#pgbar[hidden]{display:none!important}
+.pg-dots{display:flex;gap:4px;flex:0 0 auto}
+.pg-dot{width:9px;height:9px;border-radius:50%;background:var(--line);display:inline-block;transition:background .15s}
+.pg-dot.done{background:var(--teal)}
+.pg-dot.cur{background:var(--slate);transform:scale(1.25)}
+.pg-cnt{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.pg-rem{font-size:12px;font-weight:600;color:var(--ink);white-space:nowrap}
+.pg-lbl{font-size:11px;color:var(--faint);margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.rv-vtier{margin-bottom:10px}
+.rv-vtier:last-child{margin-bottom:0}
+.rv-vhd{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:5px;padding:3px 0;border-bottom:1px solid var(--line)}
+.rv-tw{font-family:var(--mono);font-size:11.5px;background:#f1f5f9;padding:1px 5px;border-radius:3px;color:#1e293b}
+.rv-etym{font-size:11px;color:#6b7280;font-style:italic}
 </style>
 </head>
 <body>
 <div style="background:#f4f6f8;border-bottom:1px solid #d8dde3;padding:6px 14px;font-size:.78rem;text-align:right;color:#666;font-family:-apple-system,'Hiragino Kaku Gothic ProN',sans-serif">上の「問題セット」は <b>10問ずつ</b>に割ってある（弱い順 ★未接触 → D4 → D3 → D2 → D1 → D5）。10問解くと<b>復習カード</b>が開く ・ <a href="./diag.html" style="color:#2563eb">実力判定をもう一度回す →</a></div>
+<div id="pgbar" hidden aria-label="解答進捗"></div>
 <div class="app">
   <header class="top">
     <div class="brand">
@@ -5284,6 +5303,30 @@ function setChunk(n) {
   buildOrder();
   save(); render(); scrollTop();
 }
+function renderPgbar() {
+  var el = document.getElementById('pgbar');
+  if (!el) return;
+  if (state.view !== 'quiz') { el.hidden = true; return; }
+  var qs = unitQs();
+  if (!qs.length) { el.hidden = true; return; }
+  el.hidden = false;
+  var answered = 0;
+  for (var i = 0; i < qs.length; i++) if (state.result[qs[i].id]) answered++;
+  var cur = state.cursor;
+  var dots = '';
+  for (var i = 0; i < qs.length; i++) {
+    var done = !!state.result[qs[i].id];
+    var cls = done ? 'pg-dot done' : (i === cur ? 'pg-dot cur' : 'pg-dot');
+    dots += '<span class="' + cls + '" aria-hidden="true"></span>';
+  }
+  var lbl = '';
+  try { lbl = unitTitle(); } catch (e) {}
+  el.innerHTML =
+    '<div class="pg-dots">' + dots + '</div>' +
+    '<span class="pg-cnt">' + (cur + 1) + ' / ' + qs.length + '問</span>' +
+    '<span class="pg-rem">残り ' + (qs.length - answered) + '問</span>' +
+    (lbl ? '<span class="pg-lbl">' + esc(lbl) + '</span>' : '');
+}
 
 function renderQuiz() {
   const stage = document.getElementById('stage');
@@ -5543,6 +5586,12 @@ function diagnosis() {
 
 
 /* ---- 復習カード ---- */
+// 技術語（snake_case / camelCase / dotted / VOCAB.words 収録語）と英語難語を自動分類する
+function vocabTier(w) {
+  if (/[_./-]/.test(w) || /^[a-z]+[A-Z]/.test(w) || /^--/.test(w) || /:/.test(w)) return 'tech';
+  if (vword(w)) return 'tech';
+  return 'eng';
+}
 const TRAPLBL = {
   T1: ['確率で守るな', '確定的な保証が要る場面を、プロンプトや few-shot で守ろうとしている'],
   T2: ['重い機構を足すな', '元の不具合に効かない重い機構を足している'],
@@ -5590,8 +5639,28 @@ function reviewCard(q, n) {
   var vk = ja.vocab ? Object.keys(ja.vocab) : [];
   var engBits = '';
   if (ja.note) engBits += '<div class="rv-sub"><div class="rv-cap">英文の読み方</div><p>' + esc(ja.note) + '</p></div>';
-  if (vk.length) engBits += '<div class="rv-sub"><div class="rv-cap">語彙</div><dl class="rv-voc">' +
-    vk.map(function (w) { return '<dt>' + esc(w) + '</dt><dd>' + esc(ja.vocab[w]) + '</dd>'; }).join('') + '</dl></div>';
+  if (vk.length) {
+    var tech = vk.filter(function (w) { return vocabTier(w) === 'tech'; });
+    var eng  = vk.filter(function (w) { return vocabTier(w) !== 'tech'; });
+    var vhtml = '';
+    if (tech.length) {
+      vhtml += '<div class="rv-vtier"><div class="rv-vhd">技術語 ' + tech.length + '</div>' +
+        '<dl class="rv-voc">' + tech.map(function (w) {
+          var ve = vword(w);
+          return '<dt><code class="rv-tw">' + esc(w) + '</code></dt>' +
+            '<dd>' + esc(ja.vocab[w]) + (ve && ve.p ? ' <span class="rv-etym">（' + esc(ve.p) + '）</span>' : '') + '</dd>';
+        }).join('') + '</dl></div>';
+    }
+    if (eng.length) {
+      vhtml += '<div class="rv-vtier"><div class="rv-vhd">英語 ' + eng.length + '</div>' +
+        '<dl class="rv-voc">' + eng.map(function (w) {
+          var ve = vword(w);
+          return '<dt>' + esc(w) + '</dt>' +
+            '<dd>' + esc(ja.vocab[w]) + (ve && ve.m ? ' <span class="rv-etym">（' + esc(ve.m) + '）</span>' : '') + '</dd>';
+        }).join('') + '</dl></div>';
+    }
+    engBits += '<div class="rv-sub"><div class="rv-cap">語彙</div>' + vhtml + '</div>';
+  }
   if (engBits) body += '<div class="rv-sec eng"><div class="rv-band">英語の解説</div>' + engBits + '</div>';
 
   var why = ja.why || en.why;
@@ -5938,6 +6007,7 @@ function wireVocab() {
 }
 
 function render() {
+  renderPgbar();
   renderGauges();
   renderRail();
   document.querySelector('.body').classList.toggle('novrail', state.view === 'vocab');
