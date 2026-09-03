@@ -438,6 +438,32 @@ code{font-family:var(--mono);font-size:.92em;background:#F0F4F6;padding:1px 5px;
   .app{padding:0 14px 48px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.ck-hero{display:flex;align-items:center;gap:20px;flex-wrap:wrap;background:var(--slate);color:#fff;
+  border-radius:var(--r);padding:20px 24px;margin-bottom:16px}
+.ck-hero.pass{background:#14532d}
+.ck-n{font-family:var(--mono);font-size:44px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.ck-n small{font-size:18px;color:#9fb0bd}
+.ck-hero.pass .ck-n small{color:#9ccfae}
+.ck-b{flex:1;min-width:180px}
+.ck-t{font-size:15px;font-weight:600;margin-bottom:4px}
+.ck-s{font-size:12.5px;color:#AEBBC4}
+.ck-hero.pass .ck-s{color:#b7e0c4}
+.ck-next{background:#fff;color:#16303f;border:0;border-radius:6px;padding:11px 18px;font-size:13.5px;
+  font-weight:600;cursor:pointer;font-family:inherit}
+.ck-next:hover{background:#e8eef2}
+.ck-foot{display:flex;justify-content:center;margin:6px 0 28px}
+.rv-band{font-size:11.5px;font-weight:600;letter-spacing:.06em;padding:7px 16px;border-bottom:1px solid #e6ebef}
+.rv-sec.eng>.rv-band{background:#eef4fb;color:#1e4976}
+.rv-sec.ai>.rv-band{background:#f2f0fb;color:#4c3a8c}
+.rv-sub{padding:12px 16px}
+.rv-sub+.rv-sub{border-top:1px dashed #e8ecef}
+.rv-tl{display:flex;gap:9px;align-items:flex-start;margin-top:6px}
+.rv-tl>b{font-family:var(--mono);font-size:12.5px;color:#4b5563;min-width:18px}
+.rv-tl .rv-trap{margin-top:0;flex:1}
+@media(max-width:640px){
+  .ck-hero{padding:16px 18px;gap:14px}
+  .ck-next{width:100%}
+}
 .rv-lead{font-size:12.5px;color:#5b6670;line-height:1.9;margin:-4px 0 14px}
 .rv-wrap{display:flex;flex-direction:column;gap:16px;margin-bottom:26px}
 .rv-card{border:1px solid #d8dde3;border-radius:var(--r);background:#fff;overflow:hidden}
@@ -608,6 +634,7 @@ code{font-family:var(--mono);font-size:.92em;background:#F0F4F6;padding:1px 5px;
     <button class="tbtn" id="t-timer">試験時間を計る</button>
     <button class="tbtn" id="t-shuffle" aria-pressed="false">出題順をシャッフル</button>
     <button class="tbtn" id="t-optshuffle" aria-pressed="true">選択肢もシャッフル</button>
+    <button class="tbtn" id="t-hold" aria-pressed="true">10問まとめて採点</button>
     <button class="tbtn rep" id="t-repeat" aria-pressed="false">正解するまで反復</button>
     <label class="setpick">習得条件
       <select id="msel">
@@ -4665,6 +4692,8 @@ const state = {
   retry: {},            // qid -> 1  (clear the stored verdict next time it is rendered)
   repeat: false,        // keep re-serving a question until it is mastered
   mastery: 1,           // correct answers in a row required to count as mastered
+  hold: true,           // 10問を通しで解いてからまとめて採点する（ドリル形式）
+  graded: {},           // セットID -> 1  採点済みのセット
   timer: { on: false, left: 120 * 60 }
 };
 
@@ -4781,7 +4810,7 @@ function snapshot() {
     settings: {
       lang: state.lang, src: state.src, set: state.set, mock: state.mock,
       shuffle: state.shuffle, optShuffle: state.optShuffle, repeat: state.repeat, mastery: state.mastery,
-      filter: state.filter,
+      filter: state.filter, hold: state.hold, graded: state.graded,
       cursorId: state.order.length ? BANK[state.order[state.cursor]].id : null
     }
   };
@@ -4822,6 +4851,8 @@ function loadInto(d) {
     state.repeat = !!g.repeat;
     if (g.mastery) state.mastery = Number(g.mastery);
     if (g.filter !== undefined) state.filter = g.filter;
+    state.hold = g.hold !== false;               // 既定はON（ドリル形式）
+    state.graded = g.graded || {};
   }
   applyUI();
   buildOrder(g && g.cursorId);
@@ -4853,6 +4884,7 @@ function applyUI() {
   const sh = document.getElementById('t-shuffle'); if (sh) sh.setAttribute('aria-pressed', state.shuffle);
   const osh = document.getElementById('t-optshuffle'); if (osh) osh.setAttribute('aria-pressed', state.optShuffle);
   const vb = document.getElementById('t-vocab'); if (vb) vb.setAttribute('aria-pressed', state.view === 'vocab');
+  const hd = document.getElementById('t-hold'); if (hd) hd.setAttribute('aria-pressed', state.hold);
   const rp = document.getElementById('t-repeat'); if (rp) rp.setAttribute('aria-pressed', state.repeat);
   document.querySelectorAll('#lang button').forEach(x => x.setAttribute('aria-pressed', x.dataset.l === state.lang));
 }
@@ -5103,6 +5135,48 @@ function stepStrip(q, res) {
 /* ---- render: question ---- */
 function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
+
+/* ---- まとめて採点（ドリル形式） ---- */
+// いま解いているのが「ひとまとまり」か。ロット（10問）と模試（60問）が該当する。
+function setKey() {
+  if (state.set.indexOf('exam:') === 0) return state.set;
+  if (state.src.indexOf('lot:') === 0) return state.src;
+  return null;
+}
+function holdActive() {
+  var k = setKey();
+  return !!(state.hold && k && !state.graded[k]);
+}
+// 採点前は結果を伏せる。state.result は記録されているが、画面には出さない。
+function shown(q) { return holdActive() ? null : state.result[q.id]; }
+function gradeSet() {
+  var k = setKey();
+  if (k) state.graded[k] = 1;
+  state.view = 'result';
+  save();
+}
+function answeredInSet() {
+  var qs = pool();
+  var n = 0;
+  for (var i = 0; i < qs.length; i++) if (state.result[qs[i].id]) n++;
+  return { done: n, total: qs.length };
+}
+// ロットの並び順は LOTMAP の定義順（build 時に弱い順で並べてある）
+function lotOrder() { return Object.keys(LOTMAP); }
+function nextLotKey() {
+  if (state.src.indexOf('lot:') !== 0) return null;
+  var ks = lotOrder(), i = ks.indexOf(state.src.slice(4));
+  return (i >= 0 && i + 1 < ks.length) ? ks[i + 1] : null;
+}
+function goToLot(key) {
+  state.src = 'lot:' + key;
+  state.view = 'quiz';
+  state.cursor = 0;
+  state.filter = 'all';
+  buildOrder();
+  save(); render(); scrollTop();
+}
+
 function renderQuiz() {
   const stage = document.getElementById('stage');
   if (!state.order.length) {
@@ -5116,7 +5190,7 @@ function renderQuiz() {
     delete state.result[q.id];
     delete state.picked[q.id];
   }
-  const res = state.result[q.id];
+  const res = shown(q);          // 採点前は null（まとめて採点のときだけ効く）
   const sel = res ? res.picked : (state.picked[q.id] || []);
   const H = hist(q.id);
   const need = q.ans.length;
@@ -5172,7 +5246,18 @@ function renderQuiz() {
   h += '</div>';
 
   h += '<div class="actions">';
-  if (!res) {
+  if (holdActive()) {
+    // ドリル形式。答えは記録するが正誤は出さない。最後の1問で「採点する」に変わる
+    var st = answeredInSet();
+    var lastQ = state.cursor >= state.order.length - 1;
+    var allDone = st.done >= st.total;
+    var lbl = (lastQ || allDone) ? ('採点する（' + st.done + '/' + st.total + '問）') : '回答して次へ →';
+    h += '<button class="primary" id="submit"' + (sel.length === need ? '' : ' disabled') + '>' + lbl + '</button>' +
+      '<span class="kbd">' + (q.type === 'multi' ? t.hintN(need) : t.hint1) +
+      '　·　<b>' + st.done + '/' + st.total + '問</b> 回答済み。採点はまとめて出ます</span>';
+    if (st.done >= 1 && !lastQ)
+      h += '<button class="nav" id="gradenow">ここまでで採点する</button>';
+  } else if (!res) {
     h += '<button class="primary" id="submit"' + (sel.length === need ? '' : ' disabled') + '>' + t.submit + '</button>' +
       '<span class="kbd">' + (q.type === 'multi' ? t.hintN(need) : t.hint1) + '</span>';
   } else {
@@ -5241,12 +5326,14 @@ function renderQuiz() {
     if (state.wordGap[w]) delete state.wordGap[w]; else state.wordGap[w] = 1;
     save(); renderQuiz();
   }));
+  const gn = document.getElementById('gradenow');
+  if (gn) gn.addEventListener('click', () => { gradeSet(); render(); scrollTop(); });
   document.getElementById('prev').addEventListener('click', () => { state.cursor--; render(); });
   document.getElementById('fwd').addEventListener('click', () => { state.cursor++; render(); });
 }
 
 function pick(q, k) {
-  if (state.result[q.id]) return;
+  if (shown(q)) return;   // 採点済みのときだけ触れなくする
   const cur = state.picked[q.id] || [];
   if (q.type === 'single') state.picked[q.id] = cur[0] === k ? [] : [k];
   else {
@@ -5267,6 +5354,13 @@ function submit(q) {
   if (ok) { h.ok++; h.streak++; } else { h.ng++; h.streak = 0; }
   h.t = Date.now();
   save();
+  if (holdActive()) {
+    // 正誤を出さずに次へ。全問答え終わっていたら採点へ
+    const st = answeredInSet();
+    if (st.done >= st.total || state.cursor >= state.order.length - 1) { gradeSet(); render(); scrollTop(); }
+    else { state.cursor++; render(); scrollTop(); }
+    return;
+  }
   render();
   const v = document.querySelector('.verdict');
   try { if (v && v.scrollIntoView) v.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
@@ -5384,14 +5478,21 @@ function reviewCard(q, n) {
       '</div></div>';
   }).join('') + '</div>';
 
-  var why = ja.why || en.why;
-  if (why) body += '<div class="rv-sec"><div class="rv-cap">なぜ ' + ansS + ' か</div><p>' + esc(why) + '</p></div>';
-
+  // 「英語の勉強」と「中身の勉強」を混ぜない。読む目的が違うので面を分ける。
   var vk = ja.vocab ? Object.keys(ja.vocab) : [];
-  if (vk.length) body += '<div class="rv-sec"><div class="rv-cap">語彙</div><dl class="rv-voc">' +
+  var engBits = '';
+  if (ja.note) engBits += '<div class="rv-sub"><div class="rv-cap">英文の読み方</div><p>' + esc(ja.note) + '</p></div>';
+  if (vk.length) engBits += '<div class="rv-sub"><div class="rv-cap">語彙</div><dl class="rv-voc">' +
     vk.map(function (w) { return '<dt>' + esc(w) + '</dt><dd>' + esc(ja.vocab[w]) + '</dd>'; }).join('') + '</dl></div>';
+  if (engBits) body += '<div class="rv-sec eng"><div class="rv-band">英語の解説</div>' + engBits + '</div>';
 
-  if (ja.note) body += '<div class="rv-sec note"><div class="rv-cap">英文の読み方</div><p>' + esc(ja.note) + '</p></div>';
+  var why = ja.why || en.why;
+  var aiBits = '';
+  if (why) aiBits += '<div class="rv-sub"><div class="rv-cap">なぜ ' + ansS + ' か</div><p>' + esc(why) + '</p></div>';
+  var wrongs = keys.filter(function (k) { return q.ans.indexOf(k) < 0 && q.traps && q.traps[k]; });
+  if (wrongs.length) aiBits += '<div class="rv-sub"><div class="rv-cap">外した型</div>' +
+    wrongs.map(function (k) { return '<div class="rv-tl"><b>' + k + '</b>' + trapChips(q, k) + '</div>'; }).join('') + '</div>';
+  if (aiBits) body += '<div class="rv-sec ai"><div class="rv-band">中身の解説</div>' + aiBits + '</div>';
 
   return '<div class="rv-card">' + head + body + '</div>';
 }
@@ -5402,14 +5503,34 @@ function reviewCards() {
   var qs = BANK.filter(function (q) { return lot.ids.indexOf(q.id) >= 0; });
   var done = qs.filter(function (q) { return state.result[q.id]; });
   if (!done.length) return '';
+  var ok = done.filter(function (q) { return state.result[q.id].ok; }).length;
+  var pct = Math.round(ok / done.length * 100);
   var nJa = qs.filter(function (q) { return q.ja && q.ja.stem; }).length;
-  var h = '<div class="tblh">復習カード · ' + esc(lot.key) + '　' + done.length + '/' + qs.length + '問を解いた</div>' +
-    '<div class="rv-lead">解いた問題を、英文と訳を並べて読み直す面。ここは解く装置ではなく<b>読む装置</b>。' +
+  var nxt = nextLotKey();
+
+  // ① 答え合わせ。まず何問取れたかを出す
+  var h = '<div class="ck-hero' + (pct >= 75 ? ' pass' : '') + '">' +
+    '<div class="ck-n">' + ok + '<small>/' + done.length + '</small></div>' +
+    '<div class="ck-b"><div class="ck-t">' + esc(lot.key) + ' の答え合わせ</div>' +
+    '<div class="ck-s">正答率 ' + pct + '%' + (pct >= 75 ? '　合格ライン（75%）を超えている' : '　合格ラインは 75%') + '</div></div>' +
+    (nxt ? '<button class="ck-next" id="nextlot">次の10問へ　' + esc(nxt) + ' →</button>'
+         : '<span class="ck-s">これが最後のセット</span>') + '</div>';
+
+  // ② 1問ずつの解説。英語の勉強と中身の勉強を面で分ける
+  h += '<div class="rv-lead">下は解いた問題の解説。1枚ずつ <b>英語の解説</b>（英文の読み方・語彙）と ' +
+    '<b>中身の解説</b>（なぜその答えか・外した型）に分けてある。' +
     '訳が入っているのはこのセットの ' + nJa + '/' + qs.length + '問。</div>' +
     '<div class="rv-wrap">' + qs.map(function (q, i) { return reviewCard(q, i + 1); }).join('') + '</div>';
+  if (nxt) h += '<div class="ck-foot"><button class="ck-next" id="nextlot2">次の10問へ　' + esc(nxt) + ' →</button></div>';
   return h;
 }
 
+function wireNextLot() {
+  ['nextlot', 'nextlot2'].forEach(function (id) {
+    var b = document.getElementById(id);
+    if (b) b.addEventListener('click', function () { var k = nextLotKey(); if (k) goToLot(k); });
+  });
+}
 function renderResult() {
   const s = stats();
   const stage = document.getElementById('stage');
@@ -5468,6 +5589,7 @@ function renderResult() {
     wrong.forEach(q => { state.retry[q.id] = 1; });   // serve them blank, not with the old verdict
     buildOrder(); save(); render(); scrollTop();
   });
+  wireNextLot();
   document.getElementById('backquiz').addEventListener('click', () => { state.view = 'quiz'; render(); });
   stage.querySelectorAll('[data-gw2]').forEach(b => b.addEventListener('click', () => {
     delete state.wordGap[b.dataset.gw2]; save(); render();
@@ -5727,6 +5849,11 @@ document.getElementById('t-optshuffle').addEventListener('click', e => {
   state.perm = {};
   save();
   render();
+});
+document.getElementById('t-hold').addEventListener('click', e => {
+  state.hold = !state.hold;
+  e.currentTarget.setAttribute('aria-pressed', state.hold);
+  save(); render();
 });
 document.getElementById('t-repeat').addEventListener('click', e => {
   state.repeat = !state.repeat;
