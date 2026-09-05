@@ -517,6 +517,16 @@ html{scroll-padding-top:42px}
 .pg-cnt{font-size:11.5px;color:var(--muted);white-space:nowrap}
 .pg-rem{font-size:12px;font-weight:600;color:var(--ink);white-space:nowrap}
 .pg-lbl{font-size:11px;color:var(--faint);margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+body.bare .qmeta > *:not(.tag):not(.queued):not(.mstflag){display:none}
+body.bare .qmeta{margin-bottom:8px}
+body.bare .app{padding-top:0}
+.pg-sp{flex:1}
+.pg-streak{font-size:11.5px;font-weight:600;color:var(--teal);white-space:nowrap}
+.pg-b{pointer-events:auto;font-family:inherit;font-size:11.5px;padding:5px 10px;min-height:30px;
+  border:1px solid var(--line);border-radius:var(--r);background:var(--card);color:var(--muted);
+  cursor:pointer;white-space:nowrap}
+.pg-b:hover{color:var(--ink);border-color:var(--faint)}
+@media (max-width:640px){ .hide-sm{display:none} .pg-b{padding:6px 9px;min-height:32px} }
 .rv-vtier{margin-bottom:10px}
 .rv-vtier:last-child{margin-bottom:0}
 .rv-vhd{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
@@ -572,7 +582,7 @@ details.adv .toolbar{border-top:1px solid var(--line-soft)}
 </style>
 </head>
 <body>
-<div style="background:#f4f6f8;border-bottom:1px solid #d8dde3;padding:6px 14px;font-size:.78rem;text-align:right;color:#666;font-family:-apple-system,'Hiragino Kaku Gothic ProN',sans-serif"><b>ドリル</b>＝弱点優先で1問ずつ・答えるたび採点。<b>模試</b>＝60問120分・最後にまとめて採点。10問セットは<b>詳細設定</b>の中 ・ <a href="./diag.html" style="color:#2563eb">実力判定をもう一度回す →</a></div>
+<div id="topband" style="background:#f4f6f8;border-bottom:1px solid #d8dde3;padding:6px 14px;font-size:.78rem;text-align:right;color:#666;font-family:-apple-system,'Hiragino Kaku Gothic ProN',sans-serif"><b>ドリル</b>＝弱点優先で1問ずつ・答えるたび採点。<b>模試</b>＝60問120分・最後にまとめて採点。10問セットは<b>詳細設定</b>の中 ・ <a href="./diag.html" style="color:#2563eb">実力判定をもう一度回す →</a></div>
 <div id="pgbar" hidden aria-label="解答進捗"></div>
 <div class="app">
   <div class="modebar">
@@ -4782,6 +4792,7 @@ const state = {
   hist: {},             // qid -> { n, ok, ng, streak, t, sure, vague, over, lucky }
   log: [],              // 1回答1行 { i:qid, ok:0|1, c:宣言, t:時刻 }。直近500件
   mode: 'drill',        // 'drill' 弱点優先で1問ずつ / 'exam' 模試60問120分
+  bare: true,           // 解いている間は問題だけ出す（帯・モードバー・詳細設定・出典を畳む）
   conf: {},             // qid -> 'sure' | 'vague'  この回の宣言。保存しない
   recent: [],           // 直近に出した qid。連続で同じ問が出ないように。保存しない
   retry: {},            // qid -> 1  (clear the stored verdict next time it is rendered)
@@ -4910,7 +4921,7 @@ function snapshot() {
       lang: state.lang, src: state.src, set: state.set, mock: state.mock,
       shuffle: state.shuffle, optShuffle: state.optShuffle, repeat: state.repeat, mastery: state.mastery,
       filter: state.filter, hold: state.hold, graded: state.graded,
-      mode: state.mode, log: state.log,
+      mode: state.mode, log: state.log, bare: state.bare,
       chunk: state.chunk, page: state.page, unit: state.unit,
       cursorId: state.order.length ? BANK[state.order[state.cursor]].id : null
     }
@@ -4958,6 +4969,7 @@ function loadInto(d) {
     state.unit = g.unit || null;
     state.graded = g.graded || {};
     state.mode = (g.mode === 'exam') ? 'exam' : 'drill';
+    state.bare = g.bare !== false;
     if (Array.isArray(g.log)) state.log = g.log;
   }
   applyUI();
@@ -5524,13 +5536,17 @@ function renderModebar() {
   // ドリルは「開いたらすぐ問題」が要点。見出し・副題・4つの計器で iPhone だと
   // 1問目が画面の外へ押し出されるので、解いている間だけ畳む。
   // 通算・直近・連続は上の固定バーが、詳細は「成績」が持っているので情報は落ちない。
-  var fold = (!ex && state.view === 'quiz');
-  var hd = document.querySelector('header.top');
-  if (hd) hd.style.display = fold ? 'none' : '';
-  // 左のドメインレールは絞り込みの道具。ドリルは弱点優先が絞り込みを兼ねるので、
-  // 解いている間は畳む（押すとドリルから抜けてしまう導線でもある）。成績画面では戻る。
-  var rl = document.querySelector('.rail');
-  if (rl) rl.style.display = fold ? 'none' : '';
+  // 解いている間は問題だけ出す。金山評 2026-09-05「余計なヘッダー・フッター、隠して。
+  // 気が散るので、問題だけでいい」。模試のときと成績画面では全部戻す。
+  var fold = (!ex && state.view === 'quiz' && state.bare !== false);
+  // 設問メタ（Q番号・ドメイン名・N OF N・出所バッジ）は解くのに要らない。CSS で畳む。
+  // ただし Select N と「N回目」は残す — 個数の取り違えは実測で落としている論点なので消せない。
+  document.body.classList.toggle('bare', fold);
+  [['header.top', 1], ['.rail', 1], ['#topband', 1], ['.modebar', 1], ['details.adv', 1], ['.foot', 1]]
+    .forEach(function (pair) {
+      var e = document.querySelector(pair[0]);
+      if (e) e.style.display = fold ? 'none' : '';
+    });
   var n = document.getElementById('mnote');
   if (n) n.textContent = ex
     ? '60問120分 · 解答中は正誤を出さない。最後にまとめて採点'
@@ -5547,11 +5563,26 @@ function drillBar(el) {
   for (var j = n - 1; j >= 0; j--) { if (log[j].ok) st++; else break; }
   var last = log.slice(-20), lok = 0;
   for (var k = 0; k < last.length; k++) lok += last[k].ok;
+  var bare = state.bare !== false;
   el.innerHTML =
     '<span class="pg-rem">通算 ' + n + '問</span>' +
     '<span class="pg-cnt">正答 ' + (n ? Math.round(ok / n * 100) : 0) + '%</span>' +
-    '<span class="pg-cnt">直近20問 ' + (last.length ? Math.round(lok / last.length * 100) + '%' : '—') + '</span>' +
-    '<span class="pg-lbl">' + (st >= 2 ? '連続 ' + st + '問正解' : '弱点優先') + '</span>';
+    '<span class="pg-cnt hide-sm">直近20問 ' + (last.length ? Math.round(lok / last.length * 100) + '%' : '—') + '</span>' +
+    (st >= 2 ? '<span class="pg-streak">連続 ' + st + '</span>' : '') +
+    '<span class="pg-sp"></span>' +
+    '<button class="pg-b" id="pg-stats">成績</button>' +
+    '<button class="pg-b" id="pg-exam">模試</button>' +
+    '<button class="pg-b" id="pg-bare">' + (bare ? '表示' : '集中') + '</button>';
+  var bs = document.getElementById('pg-stats');
+  if (bs) bs.addEventListener('click', function () { state.view = 'result'; render(); scrollTop(); });
+  var be = document.getElementById('pg-exam');
+  if (be) be.addEventListener('click', function () { setMode('exam'); });
+  var bb = document.getElementById('pg-bare');
+  if (bb) bb.addEventListener('click', function () {
+    state.bare = !bare;
+    if (!state.bare) { var d = document.querySelector('details.adv'); if (d) d.open = false; }
+    save(); render();
+  });
 }
 
 /* ---- 累積成績。state.hist と state.log から集計するだけ ---- */
