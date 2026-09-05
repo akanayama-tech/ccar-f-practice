@@ -5467,7 +5467,10 @@ function setMode(m) {
   state.order = []; state.cursor = 0;
   if (state.mode === 'drill') {
     state.set = 'all';
-    state.hold = false; state.repeat = false; state.timer.on = false;
+    // hold と repeat は触らない。ドリル中は drillOn() 側で無効化しているので落とす必要が無く、
+    // ここで false にすると「ドリルを一度押したあと、詳細設定で10問セットを選んでも
+    // まとめて採点が復活しない」（2026-09-05 に live-check が実物で捕まえた）。
+    state.timer.on = false;
     state.recent = [];
   } else {
     var sel = document.getElementById('mexamsel');
