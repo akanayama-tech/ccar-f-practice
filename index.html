@@ -517,6 +517,40 @@ html{scroll-padding-top:42px}
 .pg-cnt{font-size:11.5px;color:var(--muted);white-space:nowrap}
 .pg-rem{font-size:12px;font-weight:600;color:var(--ink);white-space:nowrap}
 .pg-lbl{font-size:11px;color:var(--faint);margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+/* 上のバーの計器。連続正解の炎と、今日の進み */
+.pg-fire{pointer-events:auto;display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;
+  padding:3px 9px 3px 6px;border-radius:20px;background:var(--line-soft);color:var(--faint);
+  font-family:var(--mono);transition:background .2s,color .2s}
+.pg-fire .fl{width:15px;height:15px;fill:currentColor;display:block}
+.pg-fire b{font-size:13.5px;font-weight:600;font-variant-numeric:tabular-nums;min-width:9px;text-align:center}
+.pg-fire.hot{background:#FDEBDC;color:#B4520F}
+.pg-fire.hot .fl{animation:flick 1.1s ease-in-out infinite}
+@keyframes flick{0%,100%{transform:scale(1)}50%{transform:scale(1.16) rotate(-3deg)}}
+.pg-goal{position:relative;flex:0 1 132px;min-width:82px;height:20px;border-radius:20px;
+  background:var(--line-soft);overflow:hidden;display:flex;align-items:center}
+.pg-goal i{position:absolute;inset:0 auto 0 0;background:var(--teal);opacity:.22;transition:width .35s ease}
+.pg-goal em{position:relative;width:100%;text-align:center;font-style:normal;font-family:var(--mono);
+  font-size:11.5px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+.pg-goal em small{color:var(--faint);font-size:10px}
+/* 答えた直後の一言。ドリルだけ */
+.fx{position:fixed;left:50%;top:64px;transform:translateX(-50%);z-index:400;pointer-events:none;
+  padding:9px 18px;border-radius:22px;font-size:14px;font-weight:600;font-family:var(--jp);
+  color:#fff;background:var(--teal);box-shadow:0 6px 20px rgba(21,33,44,.22);
+  animation:fxin .22s ease-out, fxout .3s ease-in 1s forwards}
+.fx.ng{background:#9B2C2C}
+.fx.big{background:#B4520F;font-size:17px;padding:12px 24px}
+@keyframes fxin{from{opacity:0;transform:translate(-50%,-10px) scale(.92)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+@keyframes fxout{to{opacity:0;transform:translate(-50%,-8px)}}
+/* 操作行を画面の下に貼る。選択肢を全部スクロールしないとボタンに届かない、を無くす。
+   読む → 押す → 言える/あやふや → 次へ が、指を動かさずに1周する */
+body.bare .actions{position:sticky;bottom:0;z-index:120;background:var(--card);
+  border-top:1px solid var(--line);margin:14px -16px -16px;padding:11px 16px 14px;
+  box-shadow:0 -6px 18px rgba(21,33,44,.07);border-radius:0 0 var(--r) var(--r)}
+body.bare #prev, body.bare #fwd, body.bare #tostats{display:none}
+body.bare .actions .kbd{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;font-size:11px;line-height:1.45}
+body.bare .opt.correct{animation:pop .34s ease-out}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.018)}100%{transform:scale(1)}}
 body.bare .qmeta > *:not(.tag):not(.queued):not(.mstflag){display:none}
 body.bare .qmeta{margin-bottom:8px}
 body.bare .app{padding-top:0}
@@ -4780,7 +4814,7 @@ const state = {
   examC: null,          // 模試C で引いた { scen, ids }
   lang: 'en',
   reveal: {},
-  scnOpen: true,
+  scnOpen: false,      // 既定は畳む。ドリルは1問ずつなので毎問240pxの文脈は要らない
   view: 'quiz',
   vsec: 'sys',        // 語彙タブの中の面  sys 体系 / dict 単語帳 / drill ドリル
   vq: '',             // 単語帳の絞り込み
@@ -4793,6 +4827,7 @@ const state = {
   log: [],              // 1回答1行 { i:qid, ok:0|1, c:宣言, t:時刻 }。直近500件
   mode: 'drill',        // 'drill' 弱点優先で1問ずつ / 'exam' 模試60問120分
   bare: true,           // 解いている間は問題だけ出す（帯・モードバー・詳細設定・出典を畳む）
+  goal: 20,             // 1日に解く目標問数。上のバーのゲージの分母
   conf: {},             // qid -> 'sure' | 'vague'  この回の宣言。保存しない
   recent: [],           // 直近に出した qid。連続で同じ問が出ないように。保存しない
   retry: {},            // qid -> 1  (clear the stored verdict next time it is rendered)
@@ -5487,6 +5522,8 @@ function drillEnsure() {
 function drillAdvance() { drillDraw(); save(); render(); scrollTop(); }
 
 function setMode(m) {
+  var fx = document.getElementById('fx');
+  if (fx) fx.remove();          // ドリルの一言を模試へ持ち越さない
   state.mode = (m === 'exam') ? 'exam' : 'drill';
   state.view = 'quiz';
   state.src = 'all'; state.filter = 'all';
@@ -5502,6 +5539,7 @@ function setMode(m) {
     var sel = document.getElementById('mexamsel');
     state.set = (sel && sel.value) ? sel.value : 'exam:A';
     state.hold = true;
+    state.scnOpen = true;                         // 本番はシナリオが出るので開いた状態にする
     state.timer = { on: true, left: 120 * 60 };   // 本番は 60問120分
   }
   var tb = document.getElementById('t-timer');
@@ -5554,21 +5592,42 @@ function renderModebar() {
                  : '詳細設定で範囲を絞っています（順送り）');
 }
 
-// ドリルは無限に続くので「残り何問」が無い。代わりに通算・直近・連続を出す
+// ドリルは無限に続くので「残り何問」が無い。代わりに連続正解と今日の進みを出す。
+// 数えるのは state.log（1回答1行）だけで、新しい保存先は作らない。
+function curStreak() {
+  var log = state.log || [], st = 0;
+  for (var i = log.length - 1; i >= 0; i--) { if (log[i].ok) st++; else break; }
+  return st;
+}
+function bestStreak() {
+  var log = state.log || [], best = 0, run = 0;
+  for (var i = 0; i < log.length; i++) { if (log[i].ok) { run++; if (run > best) best = run; } else run = 0; }
+  return best;
+}
+function todayCount() {
+  var log = state.log || [], t0 = new Date(), n = 0;
+  t0.setHours(0, 0, 0, 0);
+  for (var i = 0; i < log.length; i++) if (log[i].t >= t0.getTime()) n++;
+  return n;
+}
+// 炎。外部資源を引かないので SVG を直に書く
+var FLAME = '<svg class="fl" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1.5 3.5-.5 5-1.8 6.4C8.6 10.1 7 11.7 7 14.3 7 18 9.7 21 12 21s5-3 5-6.7c0-2.1-1-3.6-2.2-5.2-.4 1.2-1.1 2-2 2.4.7-3.2.5-6.6-.8-9.5z"/></svg>';
+
 function drillBar(el) {
   el.hidden = false;
   var log = state.log || [], n = log.length, ok = 0;
   for (var i = 0; i < n; i++) ok += log[i].ok;
-  var st = 0;
-  for (var j = n - 1; j >= 0; j--) { if (log[j].ok) st++; else break; }
-  var last = log.slice(-20), lok = 0;
-  for (var k = 0; k < last.length; k++) lok += last[k].ok;
+  var st = curStreak(), best = bestStreak(), today = todayCount();
+  var goal = state.goal || 20;
+  var pct = Math.min(100, Math.round(today / goal * 100));
   var bare = state.bare !== false;
   el.innerHTML =
-    '<span class="pg-rem">通算 ' + n + '問</span>' +
-    '<span class="pg-cnt">正答 ' + (n ? Math.round(ok / n * 100) : 0) + '%</span>' +
-    '<span class="pg-cnt hide-sm">直近20問 ' + (last.length ? Math.round(lok / last.length * 100) + '%' : '—') + '</span>' +
-    (st >= 2 ? '<span class="pg-streak">連続 ' + st + '</span>' : '') +
+    '<span class="pg-fire' + (st >= 3 ? ' hot' : '') + '" title="連続正解">' + FLAME + '<b>' + st + '</b></span>' +
+    '<span class="pg-goal" title="今日 ' + today + ' / ' + goal + '問">' +
+      '<i style="width:' + pct + '%"></i>' +
+      '<em>' + today + '<small>/' + goal + '</small></em></span>' +
+    '<span class="pg-cnt hide-sm">通算 ' + n + '問 · 正答 ' + (n ? Math.round(ok / n * 100) : 0) + '%' +
+      (best > 1 ? ' · 最高連続 ' + best : '') + '</span>' +
     '<span class="pg-sp"></span>' +
     '<button class="pg-b" id="pg-stats">成績</button>' +
     '<button class="pg-b" id="pg-exam">模試</button>' +
@@ -5583,6 +5642,29 @@ function drillBar(el) {
     if (!state.bare) { var d = document.querySelector('details.adv'); if (d) d.open = false; }
     save(); render();
   });
+}
+
+// 答えた直後に一言返す。ドリルだけ。模試は本番の感覚を壊すので出さない。
+function flash(msg, kind) {
+  var prev = document.getElementById('fx'); if (prev) prev.remove();
+  var e = document.createElement('div');
+  e.id = 'fx'; e.className = 'fx ' + (kind || 'ok');
+  e.textContent = msg;
+  document.body.appendChild(e);
+  setTimeout(function () { if (e.parentNode) e.remove(); }, 1300);
+}
+function afterAnswer(q) {
+  // ★この行は未発火の層。模試で一言が出ないことを実際に担保しているのは配線のほうで、
+  //   afterAnswer は宣言ボタン（#sure / #vague）からしか呼ばれず、模試にそのボタンは無い。
+  //   2026-09-05 の変異テストでこの行を消しても M-1c は赤にならなかった＝ここは未検証。
+  //   保険として残すが、「ガードがあるから安全」と読まないこと。実際の担保は M-10
+  //   「模試に宣言ボタンは出ない」が測っている。
+  if (!drillOn()) return;
+  var r = state.result[q.id]; if (!r) return;
+  var st = curStreak();
+  if (!r.ok) { flash('連続が途切れた', 'ng'); return; }
+  if (st > 0 && st % 5 === 0) flash(st + '問 連続！', 'big');
+  else flash('正解 ＋1', 'ok');
 }
 
 /* ---- 累積成績。state.hist と state.log から集計するだけ ---- */
@@ -5795,9 +5877,9 @@ function renderQuiz() {
   stage.querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => pick(q, b.dataset.k)));
   const sub = document.getElementById('submit'); if (sub) sub.addEventListener('click', () => submit(q));
   const bsure = document.getElementById('sure');
-  if (bsure) bsure.addEventListener('click', () => { state.conf[q.id] = 'sure'; submit(q); });
+  if (bsure) bsure.addEventListener('click', () => { state.conf[q.id] = 'sure'; submit(q); afterAnswer(q); });
   const bvag = document.getElementById('vague');
-  if (bvag) bvag.addEventListener('click', () => { state.conf[q.id] = 'vague'; submit(q); });
+  if (bvag) bvag.addEventListener('click', () => { state.conf[q.id] = 'vague'; submit(q); afterAnswer(q); });
   const bts = document.getElementById('tostats');
   if (bts) bts.addEventListener('click', () => { state.view = 'result'; render(); scrollTop(); });
   const nx = document.getElementById('next'); if (nx) nx.addEventListener('click', advance);
