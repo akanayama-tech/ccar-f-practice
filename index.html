@@ -523,12 +523,73 @@ html{scroll-padding-top:42px}
   color:var(--muted);margin-bottom:5px;padding:3px 0;border-bottom:1px solid var(--line)}
 .rv-tw{font-family:var(--mono);font-size:11.5px;background:#f1f5f9;padding:1px 5px;border-radius:3px;color:#1e293b}
 .rv-etym{font-size:11px;color:#6b7280;font-style:italic}
+.modebar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 20px;
+  background:var(--card);border-bottom:1px solid var(--line)}
+.mseg{display:flex;gap:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.mbtn{font-family:inherit;font-size:14px;font-weight:600;padding:10px 22px;min-height:44px;
+  border:0;background:var(--card);color:var(--muted);cursor:pointer}
+.mbtn + .mbtn{border-left:1px solid var(--line)}
+.mbtn[aria-pressed="true"]{background:var(--slate);color:#fff}
+.mexam{font-family:inherit;font-size:13px;padding:9px 10px;min-height:44px;
+  border:1px solid var(--line);border-radius:var(--r);background:var(--card);color:var(--ink)}
+.mexam[hidden]{display:none}
+.mnote{font-size:12.5px;color:var(--muted)}
+details.adv{border-bottom:1px solid var(--line);background:var(--card)}
+details.adv > summary{cursor:pointer;padding:9px 20px;font-size:12.5px;font-weight:600;
+  color:var(--muted);list-style:none;display:flex;align-items:center;gap:7px}
+details.adv > summary::-webkit-details-marker{display:none}
+details.adv > summary::before{content:"\25B6";font-size:9px;transition:transform .15s}
+details.adv[open] > summary::before{transform:rotate(90deg)}
+details.adv > summary:hover{color:var(--ink)}
+details.adv .toolbar{border-top:1px solid var(--line-soft)}
+.decl{min-width:104px}
+.decl.vague{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.dcl{display:inline-block;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:20px;
+  margin-left:10px;font-family:var(--jp)}
+.dcl.sure{background:var(--teal-soft);color:var(--teal)}
+.dcl.over{background:#FBE4E4;color:#9B2C2C}
+.dcl.luck{background:var(--amber-soft);color:var(--amber)}
+.dcl.vague{background:var(--line-soft);color:var(--muted)}
+.cum{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 14px}
+.cum-c{flex:1 1 150px;border:1px solid var(--line);border-radius:var(--r);padding:11px 13px;background:var(--card)}
+.cum-l{font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--muted);margin-bottom:5px;line-height:1.45}
+.cum-v{font-family:var(--mono);font-size:26px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums;color:var(--ink)}
+.cum-v small{font-size:14px;color:var(--faint)}
+.cum-s{font-size:11px;color:var(--faint);margin-top:5px}
+.cum.decl .cum-c:nth-child(2){border-color:#9B2C2C;background:#FDF1F1}
+.cum.decl .cum-c:nth-child(2) .cum-v{color:#9B2C2C}
+.tmk{font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:20px;margin-left:7px}
+.tmk.gap{background:var(--teal-soft);color:var(--teal)}
+.tmk.over{background:var(--amber-soft);color:var(--amber)}
+@media (max-width:640px){
+  .modebar{padding:9px 12px;gap:9px}
+  .mbtn{flex:1 1 0;padding:11px 12px}
+  .mseg{flex:1 1 100%}
+  .mnote{flex:1 1 100%;font-size:11.5px}
+  .decl{flex:1 1 40%;min-width:0}
+  .cum-c{flex:1 1 45%}
+}
 </style>
 </head>
 <body>
-<div style="background:#f4f6f8;border-bottom:1px solid #d8dde3;padding:6px 14px;font-size:.78rem;text-align:right;color:#666;font-family:-apple-system,'Hiragino Kaku Gothic ProN',sans-serif">上の「問題セット」は <b>10問ずつ</b>に割ってある（弱い順 ★未接触 → D4 → D3 → D2 → D1 → D5）。10問解くと<b>復習カード</b>が開く ・ <a href="./diag.html" style="color:#2563eb">実力判定をもう一度回す →</a></div>
+<div style="background:#f4f6f8;border-bottom:1px solid #d8dde3;padding:6px 14px;font-size:.78rem;text-align:right;color:#666;font-family:-apple-system,'Hiragino Kaku Gothic ProN',sans-serif"><b>ドリル</b>＝弱点優先で1問ずつ・答えるたび採点。<b>模試</b>＝60問120分・最後にまとめて採点。10問セットは<b>詳細設定</b>の中 ・ <a href="./diag.html" style="color:#2563eb">実力判定をもう一度回す →</a></div>
 <div id="pgbar" hidden aria-label="解答進捗"></div>
 <div class="app">
+  <div class="modebar">
+    <div class="mseg" role="group" aria-label="モード">
+      <button class="mbtn" id="m-drill" aria-pressed="true">ドリル</button>
+      <button class="mbtn" id="m-exam" aria-pressed="false">模試</button>
+    </div>
+    <select class="mexam" id="mexamsel" aria-label="どの模試を受けるか" hidden>
+      <option value="exam:A">模試A　60問120分</option>
+      <option value="exam:B">模試B　60問120分（Aと重複なし）</option>
+      <option value="exam:C">模試C　毎回抽選</option>
+    </select>
+    <span class="mnote" id="mnote"></span>
+    <div class="spacer"></div>
+    <button class="tbtn" id="m-stats">成績</button>
+  </div>
+
   <header class="top">
     <div class="brand">
       <div class="eyebrow">Claude Certified Architect · Foundations</div>
@@ -543,6 +604,8 @@ html{scroll-padding-top:42px}
     </div>
   </header>
 
+  <details class="adv">
+    <summary>詳細設定 — 10問セット・シナリオ・語彙・反復・書き出し</summary>
   <div class="toolbar">
     <label class="setpick">問題セット
       <select id="srcsel">
@@ -677,6 +740,7 @@ html{scroll-padding-top:42px}
     <button class="tbtn ghost" id="t-import">読み込み</button>
     <button class="tbtn ghost" id="t-reset">回答をすべて消す</button>
   </div>
+  </details>
 
   <div class="body">
     <aside class="rail" id="rail"></aside>
@@ -4715,7 +4779,11 @@ const state = {
   vdrill: null,       // いま出しているドリル
   vmode: 'e2j',       // e2j 語→義 / j2e 義→語 / cloze 用例の穴埋め
   vfrom: 'all',       // いまドリルがどこから出しているか
-  hist: {},             // qid -> { n, ok, ng, streak, t }
+  hist: {},             // qid -> { n, ok, ng, streak, t, sure, vague, over, lucky }
+  log: [],              // 1回答1行 { i:qid, ok:0|1, c:宣言, t:時刻 }。直近500件
+  mode: 'drill',        // 'drill' 弱点優先で1問ずつ / 'exam' 模試60問120分
+  conf: {},             // qid -> 'sure' | 'vague'  この回の宣言。保存しない
+  recent: [],           // 直近に出した qid。連続で同じ問が出ないように。保存しない
   retry: {},            // qid -> 1  (clear the stored verdict next time it is rendered)
   repeat: false,        // keep re-serving a question until it is mastered
   mastery: 1,           // correct answers in a row required to count as mastered
@@ -4842,6 +4910,7 @@ function snapshot() {
       lang: state.lang, src: state.src, set: state.set, mock: state.mock,
       shuffle: state.shuffle, optShuffle: state.optShuffle, repeat: state.repeat, mastery: state.mastery,
       filter: state.filter, hold: state.hold, graded: state.graded,
+      mode: state.mode, log: state.log,
       chunk: state.chunk, page: state.page, unit: state.unit,
       cursorId: state.order.length ? BANK[state.order[state.cursor]].id : null
     }
@@ -4888,6 +4957,8 @@ function loadInto(d) {
     state.page = g.page || 0;
     state.unit = g.unit || null;
     state.graded = g.graded || {};
+    state.mode = (g.mode === 'exam') ? 'exam' : 'drill';
+    if (Array.isArray(g.log)) state.log = g.log;
   }
   applyUI();
   buildOrder(g && g.cursorId);
@@ -4975,6 +5046,8 @@ function scnSrc(n) { return state.lang === 'ja' ? smap[n].ja : smap[n].en; }
 
 /* ---- order ---- */
 function buildOrder(keepId) {
+  // ドリルは母集合を並べない。drillDraw が1問ずつ引いて order に積む
+  if (drillOn()) { drillEnsure(); return; }
   let idx = currentExam() ? examOrderIndex() : BANK.map((q, i) => i).filter(i => inSet(BANK[i]));
   if (state.filter === 'wrong') idx = idx.filter(i => tried(BANK[i].id) && !isMastered(BANK[i].id));
   else if (state.filter === 'todo') idx = idx.filter(i => !isMastered(BANK[i].id));
@@ -5214,6 +5287,7 @@ function setKey() {
   return null;
 }
 function holdActive() {
+  if (drillOn()) return false;   // ドリルは1問ずつ即採点。まとめて採点の単位を作らない
   var k = setKey();
   return !!(state.hold && k && !state.graded[k]);
 }
@@ -5307,6 +5381,7 @@ function renderPgbar() {
   var el = document.getElementById('pgbar');
   if (!el) return;
   if (state.view !== 'quiz') { el.hidden = true; return; }
+  if (drillOn()) { drillBar(el); return; }   // ドリルは無限なので「残り何問」を出さない
   var qs = unitQs();
   if (!qs.length) { el.hidden = true; return; }
   el.hidden = false;
@@ -5326,6 +5401,218 @@ function renderPgbar() {
     '<span class="pg-cnt">' + (cur + 1) + ' / ' + qs.length + '問</span>' +
     '<span class="pg-rem">残り ' + (qs.length - answered) + '問</span>' +
     (lbl ? '<span class="pg-lbl">' + esc(lbl) + '</span>' : '');
+}
+
+
+/* ---- 2モード（ドリル / 模試） ---- */
+// 重みの根拠は 2026-09-01 の実力判定42問（wiki の cca-f-drill-log.md「優先度」列）。
+// D4 17.8 / D3 15.0 / D2 12.9 の順。D1 は 7/11 で最強だったので薄くする。
+var DOMW = { 4: 5.0, 3: 4.2, 2: 3.6, 5: 2.2, 1: 1.2 };
+var RECENT_N = 20;    // 直近この数に出た問は引かない
+var ORDER_CAP = 200;  // 戻って読み直せる履歴の上限
+
+// 弱点優先が効くのは「全問から引いている」ときだけ。
+// 詳細設定で範囲を絞ったら、そちらの指示を優先して従来の順送りに落とす。
+function drillOn() {
+  return state.mode === 'drill' && state.set === 'all' && state.src === 'all' && state.filter === 'all';
+}
+function drillWeight(q) {
+  var h = state.hist[q.id] || { n: 0, ok: 0, ng: 0, streak: 0, t: 0 };
+  var w = DOMW[q.d] || 1;
+  if (q.task && DIAG.gaps.tasks.indexOf(q.task) >= 0) w *= 2.0;  // 未接触8タスク（試験の約25%）
+  if (q.task && DIAG.over.tasks.indexOf(q.task) >= 0) w *= 1.6;  // 過信11タスク
+  if (!h.n) w *= 1.8;                                            // まだ一度も出していない
+  else if (h.streak === 0) w *= 3.0;                             // 直近で外した
+  else w *= Math.pow(0.35, h.streak);                            // 連続正解のたび薄くなる
+  if (h.over) w *= 1.5;                                          // 「言える」と言って外した前科
+  if (h.t) w *= 1 + Math.min(1, (Date.now() - h.t) / 2592e5);    // 3日で最大2倍
+  return w;
+}
+function drillPick() {
+  var cand = [], wt = [], sum = 0;
+  for (var i = 0; i < BANK.length; i++) {
+    if (state.recent.indexOf(BANK[i].id) >= 0) continue;
+    var w = drillWeight(BANK[i]);
+    if (!(w > 0)) continue;
+    cand.push(i); wt.push(w); sum += w;
+  }
+  if (!cand.length) return -1;
+  var r = Math.random() * sum, j = 0;
+  for (; j < cand.length - 1; j++) { r -= wt[j]; if (r <= 0) break; }
+  return cand[j];
+}
+function drillDraw() {
+  var idx = drillPick();
+  if (idx < 0) { state.recent = []; idx = drillPick(); }   // 出し尽くしたら直近の記憶だけ消す
+  if (idx < 0) return -1;
+  state.order.push(idx);
+  while (state.order.length > ORDER_CAP) state.order.shift();
+  state.cursor = state.order.length - 1;
+  state.recent.push(BANK[idx].id);
+  while (state.recent.length > RECENT_N) state.recent.shift();
+  state.full = state.order.length;
+  return idx;
+}
+function drillEnsure() {
+  state.full = state.order.length;
+  if (!state.order.length) drillDraw();
+  if (state.cursor >= state.order.length) state.cursor = Math.max(0, state.order.length - 1);
+}
+function drillAdvance() { drillDraw(); save(); render(); scrollTop(); }
+
+function setMode(m) {
+  state.mode = (m === 'exam') ? 'exam' : 'drill';
+  state.view = 'quiz';
+  state.src = 'all'; state.filter = 'all';
+  state.order = []; state.cursor = 0;
+  if (state.mode === 'drill') {
+    state.set = 'all';
+    state.hold = false; state.repeat = false; state.timer.on = false;
+    state.recent = [];
+  } else {
+    var sel = document.getElementById('mexamsel');
+    state.set = (sel && sel.value) ? sel.value : 'exam:A';
+    state.hold = true;
+    state.timer = { on: true, left: 120 * 60 };   // 本番は 60問120分
+  }
+  var tb = document.getElementById('t-timer');
+  if (tb) {
+    tb.setAttribute('aria-pressed', String(state.timer.on));
+    tb.textContent = state.timer.on ? '計測を止める' : '試験時間を計る';
+  }
+  applyUI(); buildOrder(); save(); render(); scrollTop();
+}
+
+// 宣言と正誤の組み合わせで原因が割れる。正誤だけでは過信が永久に見えない。
+function declChip(q, res) {
+  var cf = state.conf[q.id];
+  if (!cf) return '';
+  if (cf === 'sure') return res.ok
+    ? '<span class="dcl sure">確実 — 触らなくていい</span>'
+    : '<span class="dcl over">過信 — 知らないのではなく間違って覚えている</span>';
+  return res.ok
+    ? '<span class="dcl luck">まぐれ — 早めにもう一度出る</span>'
+    : '<span class="dcl vague">あやふや — 型か語彙か、解説で切り分ける</span>';
+}
+
+function renderModebar() {
+  var ex = state.set.indexOf('exam:') === 0;
+  var bd = document.getElementById('m-drill'); if (bd) bd.setAttribute('aria-pressed', String(!ex));
+  var be = document.getElementById('m-exam');  if (be) be.setAttribute('aria-pressed', String(ex));
+  var sel = document.getElementById('mexamsel');
+  if (sel) { sel.hidden = !ex; if (ex) sel.value = state.set; }
+  // 残り時間の計器は模試だけのもの。ドリルで出しても意味が無い数字（377問×120秒）が並ぶ
+  var ck = document.getElementById('g-clockwrap');
+  if (ck) ck.style.display = ex ? '' : 'none';
+  // ドリルは「開いたらすぐ問題」が要点。見出し・副題・4つの計器で iPhone だと
+  // 1問目が画面の外へ押し出されるので、解いている間だけ畳む。
+  // 通算・直近・連続は上の固定バーが、詳細は「成績」が持っているので情報は落ちない。
+  var fold = (!ex && state.view === 'quiz');
+  var hd = document.querySelector('header.top');
+  if (hd) hd.style.display = fold ? 'none' : '';
+  // 左のドメインレールは絞り込みの道具。ドリルは弱点優先が絞り込みを兼ねるので、
+  // 解いている間は畳む（押すとドリルから抜けてしまう導線でもある）。成績画面では戻る。
+  var rl = document.querySelector('.rail');
+  if (rl) rl.style.display = fold ? 'none' : '';
+  var n = document.getElementById('mnote');
+  if (n) n.textContent = ex
+    ? '60問120分 · 解答中は正誤を出さない。最後にまとめて採点'
+    : (drillOn() ? '弱点優先で1問ずつ · 答えるたびに採点して次へ'
+                 : '詳細設定で範囲を絞っています（順送り）');
+}
+
+// ドリルは無限に続くので「残り何問」が無い。代わりに通算・直近・連続を出す
+function drillBar(el) {
+  el.hidden = false;
+  var log = state.log || [], n = log.length, ok = 0;
+  for (var i = 0; i < n; i++) ok += log[i].ok;
+  var st = 0;
+  for (var j = n - 1; j >= 0; j--) { if (log[j].ok) st++; else break; }
+  var last = log.slice(-20), lok = 0;
+  for (var k = 0; k < last.length; k++) lok += last[k].ok;
+  el.innerHTML =
+    '<span class="pg-rem">通算 ' + n + '問</span>' +
+    '<span class="pg-cnt">正答 ' + (n ? Math.round(ok / n * 100) : 0) + '%</span>' +
+    '<span class="pg-cnt">直近20問 ' + (last.length ? Math.round(lok / last.length * 100) + '%' : '—') + '</span>' +
+    '<span class="pg-lbl">' + (st >= 2 ? '連続 ' + st + '問正解' : '弱点優先') + '</span>';
+}
+
+/* ---- 累積成績。state.hist と state.log から集計するだけ ---- */
+function cumStats() {
+  var log = state.log || [];
+  var dom = {}, task = {}, d = { sok: 0, sng: 0, vok: 0, vng: 0 }, tn = 0, tok = 0, qn = 0;
+  for (var i = 0; i < BANK.length; i++) {
+    var q = BANK[i], hh = state.hist[q.id];
+    if (!hh || !hh.n) continue;
+    qn++; tn += hh.n; tok += hh.ok;
+    var D = dom[q.d] || (dom[q.d] = { n: 0, ok: 0, q: 0, mst: 0 });
+    D.n += hh.n; D.ok += hh.ok; D.q++; if (isMastered(q.id)) D.mst++;
+    if (q.task) { var T = task[q.task] || (task[q.task] = { n: 0, ok: 0, q: 0 }); T.n += hh.n; T.ok += hh.ok; T.q++; }
+    d.sng += (hh.over || 0);
+    d.sok += (hh.sure || 0) - (hh.over || 0);
+    d.vok += (hh.lucky || 0);
+    d.vng += (hh.vague || 0) - (hh.lucky || 0);
+  }
+  if (!tn) return '<div class="tblh">累積</div><div class="legend">まだ1問も解いていません。上の「ドリル」から始めてください。</div>';
+
+  var last = log.slice(-50), lok = 0;
+  for (var j = 0; j < last.length; j++) lok += last[j].ok;
+  var t0 = new Date(); t0.setHours(0, 0, 0, 0);
+  var today = 0;
+  for (var k = 0; k < log.length; k++) if (log[k].t >= t0.getTime()) today++;
+
+  var pct = function (a, b) { return b ? Math.round(a / b * 100) : null; };
+  var cell = function (lab, val, sub) {
+    return '<div class="cum-c"><div class="cum-l">' + lab + '</div><div class="cum-v">' + val + '</div>' +
+      (sub ? '<div class="cum-s">' + sub + '</div>' : '') + '</div>';
+  };
+
+  var h = '<div class="tblh">累積 · この端末に貯まっている記録</div><div class="cum">' +
+    cell('通算 正答率', pct(tok, tn) + '<small>%</small>', tok + ' / ' + tn + ' 回') +
+    cell('直近50問', (last.length ? pct(lok, last.length) + '<small>%</small>' : '—'),
+         last.length ? lok + ' / ' + last.length + ' 問' : '記録なし') +
+    cell('今日 解いた数', today + '<small>問</small>', '0時からの回答数') +
+    cell('触れた問題', qn + '<small>/' + BANK.length + '</small>', '一度でも解いた問題') +
+    '</div>';
+
+  // 宣言 2x2。ここが過信を名指しで出す唯一の場所
+  var dtot = d.sok + d.sng + d.vok + d.vng;
+  if (dtot) {
+    h += '<div class="tblh">宣言 × 正誤 · 外した理由を割る</div><div class="cum decl">' +
+      cell('言える → ○<br><b>確実</b>', d.sok, '触らなくていい') +
+      cell('言える → ✗<br><b>過信</b>', d.sng, '間違って覚えている。最優先') +
+      cell('あやふや → ○<br>まぐれ', d.vok, '定着していない') +
+      cell('あやふや → ✗<br>型 or 語彙', d.vng, '解説で切り分ける') +
+      '</div><div class="legend">実力判定42問では<b>過信が12件・29%</b>で最大の失点要因だった。正誤だけを貯めても、この列は永久に出ない。</div>';
+  }
+
+  h += '<div class="tblh">Domain · 累積の正答率（試行ベース）</div><div class="tbl">';
+  DOMAINS.forEach(function (dd) {
+    var st = dom[dd.n]; if (!st) return;
+    var p = pct(st.ok, st.n), low = p !== null && p < 75;
+    h += '<div class="row"><div class="nm"><span>D' + dd.n + ' · ' + dd.weight + '%</span>' + dTitle(dd.n) +
+      '<small> ' + st.q + '問に触れ ' + st.n + '回解答 · 習得 ' + st.mst + '</small></div>' +
+      '<div class="track"><i class="' + (low ? 'low' : '') + '" style="width:' + (p || 0) + '%"></i><span class="target" style="left:75%"></span></div>' +
+      '<div class="pct' + (low ? ' low' : '') + '">' + (p === null ? '—' : p + '%') + '</div></div>';
+  });
+  h += '</div>';
+
+  var tk = Object.keys(task).filter(function (t) { return task[t].n >= 2; })
+    .sort(function (a, b) { return (task[a].ok / task[a].n) - (task[b].ok / task[b].n); }).slice(0, 12);
+  if (tk.length) {
+    h += '<div class="tblh">Task · 弱い順（2回以上解いたものだけ）</div><div class="tbl">';
+    tk.forEach(function (t) {
+      var st = task[t], p = pct(st.ok, st.n), low = p !== null && p < 75;
+      var mark = DIAG.gaps.tasks.indexOf(t) >= 0 ? '<span class="tmk gap">★未接触</span>'
+               : (DIAG.over.tasks.indexOf(t) >= 0 ? '<span class="tmk over">⚠過信</span>' : '');
+      h += '<div class="row"><div class="nm"><span>Task ' + t + '</span>' + mark +
+        '<small> ' + st.q + '問 · ' + st.n + '回</small></div>' +
+        '<div class="track"><i class="' + (low ? 'low' : '') + '" style="width:' + (p || 0) + '%"></i><span class="target" style="left:75%"></span></div>' +
+        '<div class="pct' + (low ? ' low' : '') + '">' + (p === null ? '—' : p + '%') + '</div></div>';
+    });
+    h += '</div><div class="legend">縦線 = 75% 目標ライン。★未接触・⚠過信 は 2026-09-01 の実力判定で割れた分類。</div>';
+  }
+  return h;
 }
 
 function renderQuiz() {
@@ -5408,13 +5695,23 @@ function renderQuiz() {
       '　·　<b>' + st.done + '/' + st.total + '問</b> 回答済み。採点はまとめて出ます</span>';
     if (st.done >= 1 && !lastQ)
       h += '<button class="nav" id="gradenow">ここまでで採点する</button>';
+  } else if (drillOn() && !res) {
+    // 選んでから「言える / あやふや」で確定する。タップ数は Duolingo の 選ぶ→CHECK と同じ。
+    // 正誤だけでは「型で外した」も「間違って覚えていた」も同じ ✗ にしかならない。
+    var rdy = sel.length === need;
+    h += '<button class="primary decl" id="sure"' + (rdy ? '' : ' disabled') + '>言える</button>' +
+      '<button class="primary decl vague" id="vague"' + (rdy ? '' : ' disabled') + '>あやふや</button>' +
+      '<span class="kbd">' + (q.type === 'multi' ? t.hintN(need) : t.hint1) +
+      '　·　答えを開く前に<b>言えるか</b>を選ぶ。「言える」で外したものが<b>過信</b>として貯まる</span>';
   } else if (!res) {
     h += '<button class="primary" id="submit"' + (sel.length === need ? '' : ' disabled') + '>' + t.submit + '</button>' +
       '<span class="kbd">' + (q.type === 'multi' ? t.hintN(need) : t.hint1) + '</span>';
   } else {
-    const last = state.cursor >= state.order.length - 1;
-    h += '<button class="primary" id="next">' + (last ? t.last : t.next) + '</button>' +
-      '<button class="nav" id="again">もう一度解く</button>';
+    const dm = drillOn();
+    const last = !dm && state.cursor >= state.order.length - 1;
+    h += '<button class="primary" id="next">' + (dm ? '次の問題 →' : (last ? t.last : t.next)) + '</button>' +
+      '<button class="nav" id="again">もう一度解く</button>' +
+      (dm ? '<button class="nav" id="tostats">成績を見る</button>' : '');
   }
   h += '<div class="spacer"></div>';
   if (state.lang === 'en') h += '<button class="nav" id="reveal">' + (state.reveal[q.id] ? t.hide : t.reveal) + '</button>';
@@ -5424,7 +5721,7 @@ function renderQuiz() {
 
   if (res) {
     h += '<div class="verdict ' + (res.ok ? 'v-ok' : 'v-ng') + '">' +
-      '<div class="vhead"><span class="stamp">' + (res.ok ? t.ok : t.ng) + '</span>' +
+      '<div class="vhead"><span class="stamp">' + (res.ok ? t.ok : t.ng) + '</span>' + declChip(q, res) +
       '<span class="ansline">' + t.ansl + ' <b>' + dispList(q, q.ans) + '</b>' +
       (res.ok ? '' : '　　' + t.your + ' ' + dispList(q, res.picked)) + '</span></div>' +
       '<div class="vbody">' +
@@ -5449,6 +5746,12 @@ function renderQuiz() {
   if (tog) tog.addEventListener('click', () => { state.scnOpen = !state.scnOpen; renderQuiz(); });
   stage.querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => pick(q, b.dataset.k)));
   const sub = document.getElementById('submit'); if (sub) sub.addEventListener('click', () => submit(q));
+  const bsure = document.getElementById('sure');
+  if (bsure) bsure.addEventListener('click', () => { state.conf[q.id] = 'sure'; submit(q); });
+  const bvag = document.getElementById('vague');
+  if (bvag) bvag.addEventListener('click', () => { state.conf[q.id] = 'vague'; submit(q); });
+  const bts = document.getElementById('tostats');
+  if (bts) bts.addEventListener('click', () => { state.view = 'result'; render(); scrollTop(); });
   const nx = document.getElementById('next'); if (nx) nx.addEventListener('click', advance);
   const ag = document.getElementById('again'); if (ag) ag.addEventListener('click', () => againNow(q));
   const rv = document.getElementById('reveal');
@@ -5504,6 +5807,13 @@ function submit(q) {
   h.n++;
   if (ok) { h.ok++; h.streak++; } else { h.ng++; h.streak = 0; }
   h.t = Date.now();
+  // 宣言（言える / あやふや）と正誤の組み合わせを貯める。ここだけが過信を名指しできる
+  var cf = state.conf[q.id];
+  if (cf === 'sure') { h.sure = (h.sure || 0) + 1; if (!ok) h.over = (h.over || 0) + 1; }
+  else if (cf === 'vague') { h.vague = (h.vague || 0) + 1; if (ok) h.lucky = (h.lucky || 0) + 1; }
+  if (!state.log) state.log = [];
+  state.log.push({ i: q.id, ok: ok ? 1 : 0, c: cf || '', t: Date.now() });
+  while (state.log.length > 500) state.log.shift();
   save();
   if (holdActive()) {
     // 正誤を出さずに次へ。全問答え終わっていたら採点へ
@@ -5533,6 +5843,7 @@ function queueRetry(q) {                   // put it back a few questions down t
 }
 
 function advance() {
+  if (drillOn()) { drillAdvance(); return; }
   const q = state.order.length ? BANK[state.order[state.cursor]] : null;
   if (q && state.repeat && state.result[q.id] && !isMastered(q.id)) queueRetry(q);
 
@@ -5717,6 +6028,7 @@ function renderResult() {
   const stage = document.getElementById('stage');
   let h = examSummary();
   h += reviewCards();
+  h += cumStats();
   h += diagnosis();
   h += '<div class="res-hero"><div><div class="cap">Mastered</div>' +
     '<div class="big">' + s.mst + '<small>/' + s.total + '</small></div></div>' +
@@ -6007,6 +6319,7 @@ function wireVocab() {
 }
 
 function render() {
+  renderModebar();
   renderPgbar();
   renderGauges();
   renderRail();
@@ -6107,12 +6420,21 @@ document.getElementById('lang').addEventListener('click', e => {
   save();
   render();
 });
+document.getElementById('m-drill').addEventListener('click', () => setMode('drill'));
+document.getElementById('m-exam').addEventListener('click', () => setMode('exam'));
+document.getElementById('mexamsel').addEventListener('change', e => {
+  state.set = e.currentTarget.value; state.mode = 'exam';
+  state.order = []; state.cursor = 0;
+  applyUI(); buildOrder(); save(); render(); scrollTop();
+});
+document.getElementById('m-stats').addEventListener('click', () => { state.view = 'result'; render(); scrollTop(); });
 document.getElementById('t-result').addEventListener('click', () => { state.view = 'result'; render(); scrollTop(); });
 document.getElementById('t-reset').addEventListener('click', () => {
   confirmBox('回答をすべて消す',
     '回答・試行履歴・習得状況をすべて削除して最初から始めます。この操作は取り消せません。<br>残しておきたい場合は先に「書き出し」でJSONを保存してください。',
     'すべて消す', () => {
     state.result = {}; state.picked = {}; state.hist = {}; state.retry = {};
+    state.log = []; state.conf = {}; state.recent = []; state.order = []; state.cursor = 0;
     state.view = 'quiz'; state.filter = 'all';
     state.timer = { on: false, left: pool().length * 120 };
     document.getElementById('t-timer').textContent = '試験時間を計る';
@@ -6282,6 +6604,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
     e.preventDefault();
     if (state.result[q.id]) advance();
+    else if (drillOn()) { /* 宣言（言える / あやふや）で確定するので Enter では送らない */ }
     else if ((state.picked[q.id] || []).length === q.ans.length) submit(q);
     return;
   }
