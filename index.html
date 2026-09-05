@@ -629,6 +629,70 @@ details.adv .toolbar{border-top:1px solid var(--line-soft)}
   .blk.tms dl{grid-template-columns:1fr;gap:2px}
   .blk.tms dt{margin-top:7px}
 }
+
+.home{max-width:720px;margin:0 auto;padding:6px 0 40px}
+.hm-top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:6px 0 16px}
+.hm-t{font-size:20px;font-weight:600;color:var(--ink)}
+.hm-d{font-family:var(--mono);font-size:13px;color:var(--amber);background:var(--amber-soft);
+  padding:4px 11px;border-radius:20px}
+.hm-d b{font-size:16px}
+.hm-kpi{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:18px}
+.hm-kpi > div{flex:1 1 130px;border:1px solid var(--line);border-radius:var(--r);
+  padding:10px 12px;background:var(--card)}
+.hm-kpi b{display:block;font-size:11px;font-weight:600;letter-spacing:.05em;color:var(--muted);margin-bottom:4px}
+.hm-kpi span{font-family:var(--mono);font-size:24px;font-weight:600;color:var(--ink);
+  font-variant-numeric:tabular-nums;line-height:1}
+.hm-kpi span small{font-size:13px;color:var(--faint);font-weight:400}
+.hm-sub{display:block;font-style:normal;font-size:11px;color:var(--faint);margin-top:5px}
+.hm-bar{display:block;position:relative;height:6px;border-radius:6px;background:var(--line-soft);
+  margin-top:8px;overflow:hidden}
+.hm-bar u{position:absolute;inset:0 auto 0 0;background:var(--teal);text-decoration:none;transition:width .35s}
+.hm-bar u.low{background:var(--amber)}
+.hm-go{display:flex;gap:11px;flex-wrap:wrap;margin-bottom:8px}
+.hm-b{flex:1 1 220px;text-align:left;font-family:inherit;cursor:pointer;
+  border:1px solid var(--line);border-radius:var(--r);background:var(--card);
+  padding:16px 18px;min-height:76px;color:var(--ink);transition:border-color .15s,background .15s}
+.hm-b:hover{border-color:var(--faint)}
+.hm-b b{display:block;font-size:17px;font-weight:600;margin-bottom:4px}
+.hm-b em{font-style:normal;font-size:12px;color:var(--muted);line-height:1.5}
+.hm-b.go{background:var(--slate);border-color:var(--slate);color:#fff}
+.hm-b.go em{color:#AEBBC4}
+.hm-b.go:hover{background:var(--slate-2)}
+.hm-note{font-size:11.5px;color:var(--faint);margin-bottom:22px;display:flex;align-items:center;
+  gap:8px;flex-wrap:wrap;line-height:1.6}
+.hm-sel{font-family:inherit;font-size:12px;padding:5px 8px;border:1px solid var(--line);
+  border-radius:var(--r);background:var(--card);color:var(--ink)}
+.hm-h{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  padding-bottom:5px;border-bottom:1px solid var(--line);margin:0 0 10px}
+.hm-h small{font-weight:400;letter-spacing:0;text-transform:none;color:var(--faint);margin-left:8px}
+.hm-doms{margin-bottom:22px}
+.hm-dom{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line-soft)}
+.hm-dn{flex:1 1 auto;min-width:0;font-size:13px;color:var(--ink)}
+.hm-dn b{font-family:var(--mono);color:var(--muted);margin-right:5px}
+.hm-dn small{display:block;font-size:11px;color:var(--faint);margin-top:2px}
+.hm-dom .hm-bar{flex:0 0 96px;margin-top:0}
+.hm-tgt{position:absolute;left:75%;top:0;bottom:0;width:1px;background:var(--faint)}
+.hm-pc{flex:0 0 44px;text-align:right;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink)}
+.hm-pc.low{color:var(--amber)}
+.hm-two{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:22px}
+.hm-two > div{flex:1 1 200px;border:1px solid var(--line);border-radius:var(--r);padding:11px 13px;background:var(--card)}
+.hm-two.warn, .hm-two > div.warn{border-color:var(--amber)}
+.hm-two b{display:block;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.hm-two span{font-family:var(--mono);font-size:21px;font-weight:600;color:var(--ink)}
+.hm-two span small{font-size:12px;color:var(--faint)}
+.hm-two i{display:block;font-style:normal;font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5}
+.hm-links{display:flex;gap:9px;flex-wrap:wrap}
+.hm-l{font-family:inherit;font-size:12.5px;padding:9px 14px;min-height:40px;border:1px solid var(--line);
+  border-radius:var(--r);background:var(--card);color:var(--muted);cursor:pointer;
+  text-decoration:none;display:inline-flex;align-items:center}
+.hm-l:hover{color:var(--ink);border-color:var(--faint)}
+.pg-b.home{background:var(--slate);color:#fff;border-color:var(--slate)}
+@media (max-width:640px){
+  .hm-kpi > div{flex:1 1 45%}
+  .hm-b{flex:1 1 100%}
+  .hm-dom{gap:8px}
+  .hm-dom .hm-bar{flex:0 0 64px}
+}
 </style>
 </head>
 <body>
@@ -4819,7 +4883,7 @@ const state = {
   lang: 'en',
   reveal: {},
   scnOpen: false,      // 既定は畳む。ドリルは1問ずつなので毎問240pxの文脈は要らない
-  view: 'quiz',
+  view: 'home',        // 開いたら全体像から。モードの切替はトップに集める
   vsec: 'sys',        // 語彙タブの中の面  sys 体系 / dict 単語帳 / drill ドリル
   vq: '',             // 単語帳の絞り込み
   vhist: {},          // 単語 -> { n, ok, ng, streak }
@@ -5452,7 +5516,17 @@ function renderPgbar() {
     '<div class="pg-dots">' + dots + '</div>' +
     '<span class="pg-cnt">' + (cur + 1) + ' / ' + qs.length + '問</span>' +
     '<span class="pg-rem">残り ' + (qs.length - answered) + '問</span>' +
-    (lbl ? '<span class="pg-lbl">' + esc(lbl) + '</span>' : '');
+    (lbl ? '<span class="pg-lbl">' + esc(lbl) + '</span>' : '') +
+    // 模試でもトップへ1タップで戻れるようにする。ここが無いと、60個のドットの下に
+    // モードバーが埋もれて「モードが変えられない」ように見える（金山評 2026-09-05）
+    '<span class="pg-sp"></span>' +
+    '<button class="pg-b home" id="pg-home2">トップ</button>';
+  var bh2 = document.getElementById('pg-home2');
+  if (bh2) bh2.addEventListener('click', function () {
+    if (state.timer.on && !confirm('模試を中断してトップへ戻ります。よろしいですか')) return;
+    state.timer.on = false;
+    state.view = 'home'; save(); render(); scrollTop();
+  });
 }
 
 
@@ -5581,7 +5655,7 @@ function renderModebar() {
   // 通算・直近・連続は上の固定バーが、詳細は「成績」が持っているので情報は落ちない。
   // 解いている間は問題だけ出す。金山評 2026-09-05「余計なヘッダー・フッター、隠して。
   // 気が散るので、問題だけでいい」。模試のときと成績画面では全部戻す。
-  var fold = (!ex && state.view === 'quiz' && state.bare !== false);
+  var fold = (!ex && (state.view === 'quiz' || state.view === 'home') && state.bare !== false);
   // 設問メタ（Q番号・ドメイン名・N OF N・出所バッジ）は解くのに要らない。CSS で畳む。
   // ただし Select N と「N回目」は残す — 個数の取り違えは実測で落としている論点なので消せない。
   document.body.classList.toggle('bare', fold);
@@ -5634,13 +5708,13 @@ function drillBar(el) {
     '<span class="pg-cnt hide-sm">通算 ' + n + '問 · 正答 ' + (n ? Math.round(ok / n * 100) : 0) + '%' +
       (best > 1 ? ' · 最高連続 ' + best : '') + '</span>' +
     '<span class="pg-sp"></span>' +
+    '<button class="pg-b home" id="pg-home">トップ</button>' +
     '<button class="pg-b" id="pg-stats">成績</button>' +
-    '<button class="pg-b" id="pg-exam">模試</button>' +
     '<button class="pg-b" id="pg-bare">' + (bare ? '表示' : '集中') + '</button>';
+  var bh = document.getElementById('pg-home');
+  if (bh) bh.addEventListener('click', function () { state.view = 'home'; save(); render(); scrollTop(); });
   var bs = document.getElementById('pg-stats');
   if (bs) bs.addEventListener('click', function () { state.view = 'result'; render(); scrollTop(); });
-  var be = document.getElementById('pg-exam');
-  if (be) be.addEventListener('click', function () { setMode('exam'); });
   var bb = document.getElementById('pg-bare');
   if (bb) bb.addEventListener('click', function () {
     state.bare = !bare;
@@ -5774,6 +5848,118 @@ function termBlock(q) {
     hit.map(function (w) {
       return '<dt>' + esc(w) + '</dt><dd>' + esc(TERMS[w]) + '</dd>';
     }).join('') + '</dl></div>';
+}
+
+
+// 本番の想定日。過ぎたらカウントダウンを出さない（古い数字を出し続けないため）
+var EXAM_DATE = '2026-09-09';
+function daysLeft() {
+  var d = new Date(EXAM_DATE + 'T00:00:00');
+  var t0 = new Date(); t0.setHours(0, 0, 0, 0);
+  return Math.round((d - t0) / 86400000);
+}
+function homeStats() {
+  var log = state.log || [], n = log.length, ok = 0;
+  for (var i = 0; i < n; i++) ok += log[i].ok;
+  var touched = 0, sure = 0, over = 0;
+  for (var j = 0; j < BANK.length; j++) {
+    var h = state.hist[BANK[j].id];
+    if (h && h.n) { touched++; sure += (h.sure || 0); over += (h.over || 0); }
+  }
+  return { n: n, ok: ok, acc: n ? Math.round(ok / n * 100) : null, touched: touched,
+           streak: curStreak(), best: bestStreak(), today: todayCount(), over: over };
+}
+function domRow(d) {
+  var qs = BANK.filter(function (q) { return q.d === d; });
+  var tried = 0, tries = 0, oks = 0;
+  qs.forEach(function (q) { var h = state.hist[q.id]; if (h && h.n) { tried++; tries += h.n; oks += h.ok; } });
+  return { d: d, total: qs.length, tried: tried, acc: tries ? Math.round(oks / tries * 100) : null };
+}
+function taskGroupRow(key) {
+  var qs = BANK.filter(function (q) { return q.task && DIAG[key].tasks.indexOf(q.task) >= 0; });
+  var tried = 0, tries = 0, oks = 0;
+  qs.forEach(function (q) { var h = state.hist[q.id]; if (h && h.n) { tried++; tries += h.n; oks += h.ok; } });
+  return { total: qs.length, tried: tried, acc: tries ? Math.round(oks / tries * 100) : null };
+}
+function renderHome() {
+  var fx = document.getElementById('fx');
+  if (fx) fx.remove();          // ドリルの一言をトップへ持ち越さない
+  var s = homeStats(), goal = state.goal || 20;
+  var pct = Math.min(100, Math.round(s.today / goal * 100));
+  var dl = daysLeft();
+  var h = '<div class="home">';
+
+  h += '<div class="hm-top">' +
+    '<div class="hm-t">CCAR-F 練習</div>' +
+    (dl >= 0 ? '<div class="hm-d">本番まで <b>' + dl + '</b> 日</div>' : '') +
+    '</div>';
+
+  // いまどこか
+  h += '<div class="hm-kpi">' +
+    '<div><b>今日</b><span>' + s.today + '<small>/' + goal + '</small></span>' +
+      '<i class="hm-bar"><u style="width:' + pct + '%"></u></i></div>' +
+    '<div><b>連続正解</b><span>' + s.streak + (s.best > 1 ? '<small> 最高 ' + s.best + '</small>' : '') + '</span></div>' +
+    '<div><b>通算 正答率</b><span>' + (s.acc === null ? '—' : s.acc + '<small>%</small>') + '</span>' +
+      '<i class="hm-sub">' + s.ok + ' / ' + s.n + ' 回</i></div>' +
+    '<div><b>触れた問題</b><span>' + s.touched + '<small>/' + BANK.length + '</small></span></div>' +
+    '</div>';
+
+  // やること2つ。ここが切替の唯一の入口
+  h += '<div class="hm-go">' +
+    '<button class="hm-b go" id="go-drill"><b>ドリル</b>' +
+      '<em>弱点優先で1問ずつ。答えるたびに採点</em></button>' +
+    '<button class="hm-b" id="go-exam"><b>模試</b>' +
+      '<em>60問120分。解答中は正誤を伏せる</em></button>' +
+    '</div>';
+  h += '<div class="hm-note">模試はA・Bが本番と同じ配分（27:18:20:20:15）で、1問も重ならない。Cは毎回引き直す。' +
+    '<select class="hm-sel" id="go-examsel">' +
+      '<option value="exam:A">模試A</option><option value="exam:B">模試B</option><option value="exam:C">模試C 毎回抽選</option>' +
+    '</select></div>';
+
+  // ドメイン別の現在地。並びは実力判定の優先度（弱い順）
+  h += '<div class="hm-h">ドメイン別の現在地 <small>弱い順・出題比率つき</small></div><div class="hm-doms">';
+  [4, 3, 2, 1, 5].forEach(function (d) {
+    var r = domRow(d), w = DOMAINS.find(function (x) { return x.n === d; });
+    var low = r.acc !== null && r.acc < 75;
+    h += '<div class="hm-dom"><div class="hm-dn"><b>D' + d + '</b> ' + esc(dTitle(d)) +
+      '<small>出題 ' + (w ? w.weight : '') + '% · ' + r.tried + '/' + r.total + '問に触れた</small></div>' +
+      '<i class="hm-bar"><u class="' + (low ? 'low' : '') + '" style="width:' + (r.acc || 0) + '%"></u>' +
+      '<span class="hm-tgt"></span></i>' +
+      '<div class="hm-pc' + (low ? ' low' : '') + '">' + (r.acc === null ? '—' : r.acc + '%') + '</div></div>';
+  });
+  h += '</div>';
+
+  // 実力判定で割れた2つの山
+  var g = taskGroupRow('gaps'), o = taskGroupRow('over');
+  h += '<div class="hm-h">2026-09-01 の実力判定で割れた山</div><div class="hm-two">' +
+    '<div><b>★未接触</b><span>' + g.tried + '<small>/' + g.total + '</small></span>' +
+      '<i>知らないものは知らない。' + (g.acc === null ? 'まだ触れていない' : '正答 ' + g.acc + '%') + '</i></div>' +
+    '<div class="warn"><b>⚠過信</b><span>' + o.tried + '<small>/' + o.total + '</small></span>' +
+      '<i>間違って覚えている。累計 ' + s.over + ' 件の過信</i></div>' +
+    '</div>';
+
+  h += '<div class="hm-links">' +
+    '<button class="hm-l" id="go-stats">成績をくわしく見る</button>' +
+    '<a class="hm-l" href="./diag.html">実力判定をもう一度回す</a>' +
+    '<button class="hm-l" id="go-adv">詳細設定</button>' +
+    '</div>';
+
+  h += '</div>';
+  document.getElementById('stage').innerHTML = h;
+
+  document.getElementById('go-drill').addEventListener('click', function () { setMode('drill'); });
+  document.getElementById('go-exam').addEventListener('click', function () {
+    var sel = document.getElementById('go-examsel');
+    var ms = document.getElementById('mexamsel');
+    if (sel && ms) ms.value = sel.value;
+    setMode('exam');
+  });
+  document.getElementById('go-stats').addEventListener('click', function () { state.view = 'result'; render(); scrollTop(); });
+  document.getElementById('go-adv').addEventListener('click', function () {
+    state.bare = false; state.view = 'quiz'; save(); render();
+    var d = document.querySelector('details.adv'); if (d) d.open = true;
+    scrollTop();
+  });
 }
 
 function renderQuiz() {
@@ -6489,7 +6675,8 @@ function render() {
   renderGauges();
   renderRail();
   document.querySelector('.body').classList.toggle('novrail', state.view === 'vocab');
-  if (state.view === 'vocab') renderVocab();
+  if (state.view === 'home') renderHome();
+  else if (state.view === 'vocab') renderVocab();
   else if (state.view === 'result') renderResult();
   else renderQuiz();
 }
