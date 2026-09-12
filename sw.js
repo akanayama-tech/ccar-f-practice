@@ -1,7 +1,7 @@
 /* ネット優先。取れたらそれを配り、落ちた時だけキャッシュを返す。
    ★キャッシュ優先にしない。古い版が居座って「直したのに直らない」が起きるため。
    版はビルドの中身から作るので、中身が変われば名前が変わり、古いものは activate で消える。 */
-var CACHE = 'ccarf-b20bc6d1';
+var CACHE = 'ccarf-e430d1a2';
 var ASSETS = ['./', './index.html', './manifest.webmanifest',
               './icon-180.png', './icon-192.png', './icon-512.png', './icon-512-maskable.png', './diag.html'];
 
